@@ -1,4 +1,4 @@
-package com.jayden.drawtool.ui;
+package com.jayden.drawtool.ui.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,8 +20,6 @@ import android.view.WindowManager;
 
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.bean.Picture;
-import com.jayden.drawtool.bean.Text;
 import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.touch.DrawFreehandTouch;
 import com.jayden.drawtool.touch.DrawTouch;
@@ -171,29 +169,7 @@ public class CanvasView extends View {
             if (touch instanceof TransformTouch) //选中状态才产生动态画笔效果
             {
                 setAnimPaint();
-                //文本图元
-                if (selectedPel.text != null) {
-                    Text text = selectedPel.text;
-                    canvas.save();
-                    canvas.translate(selectedPel.transDx, selectedPel.transDy);
-                    canvas.scale(selectedPel.scale, selectedPel.scale, text.getCenterPoint().x, text.getCenterPoint().y);
-                    canvas.rotate(selectedPel.degree, text.getCenterPoint().x, text.getCenterPoint().y);
-                    canvas.drawText(text.getContent(), text.getBeginPoint().x, text.getBeginPoint().y, text.getPaint());
-                    canvas.restore();
-                }
-                //图标图元
-                else if (selectedPel.picture != null) {
-                    Picture picture = selectedPel.picture;
-                    canvas.save();
-                    canvas.translate(selectedPel.transDx, selectedPel.transDy);
-                    canvas.scale(selectedPel.scale, selectedPel.scale, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    canvas.rotate(selectedPel.degree, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    canvas.drawBitmap(picture.createContent(), picture.getBeginPoint().x, picture.getBeginPoint().y, drawPicturePaint);
-                    canvas.restore();
-                } else {
-                    canvas.drawPath(selectedPel.path, selectedPel.paint);
-                }
-
+                selectedPel.drawObject(canvas);
                 //动画矩阵虚线
                 Path path = new Path();
                 path.moveTo(selectedPel.leftTopPoint.x, selectedPel.leftTopPoint.y);
@@ -302,29 +278,7 @@ public class CanvasView extends View {
         while (pelIterator.hasNext()) {
             Pel pel = pelIterator.next();
             if (!pel.equals(selectedPel)) {
-                //文本图元
-                if (pel.text != null) {
-                    Text text = pel.text;
-                    savedCanvas.save();
-                    savedCanvas.translate(pel.transDx, pel.transDy);
-                    savedCanvas.scale(pel.scale, pel.scale, text.getCenterPoint().x, text.getCenterPoint().y);
-                    savedCanvas.rotate(pel.degree, text.getCenterPoint().x, text.getCenterPoint().y);
-                    savedCanvas.drawText(text.getContent(), text.getBeginPoint().x, text.getBeginPoint().y, text.getPaint());
-                    savedCanvas.restore();
-                }
-                //图标图元
-                else if (pel.picture != null) {
-                    Picture picture = pel.picture;
-                    savedCanvas.save();
-                    savedCanvas.translate(pel.transDx, pel.transDy);
-                    savedCanvas.scale(pel.scale, pel.scale, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    savedCanvas.rotate(pel.degree, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    savedCanvas.drawBitmap(picture.createContent(), picture.getBeginPoint().x, picture.getBeginPoint().y, drawPicturePaint);
-                    savedCanvas.restore();
-                }
-                //路径
-                else
-                    savedCanvas.drawPath(pel.path, pel.paint);
+                pel.drawObject(savedCanvas);
             }
         }
     }

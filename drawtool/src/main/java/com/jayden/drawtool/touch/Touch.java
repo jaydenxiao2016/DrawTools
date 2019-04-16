@@ -7,11 +7,9 @@ import android.graphics.PointF;
 import android.graphics.Region;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.bean.Picture;
-import com.jayden.drawtool.bean.Text;
 import com.jayden.drawtool.step.Step;
-import com.jayden.drawtool.ui.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -128,34 +126,12 @@ public class Touch {
         CanvasView.setSavedBitmap(savedBitmap); // 改变CanvasView中的savedBitmap方便更新
     }
 
-    public void  drawPels() {
+    public void drawPels() {
         ListIterator<Pel> pelIterator = pelList.listIterator();// 获取pelList对应的迭代器头结点
         while (pelIterator.hasNext()) {
             Pel pel = pelIterator.next();
             if (!pel.equals(selectedPel)) {
-                //文本图元
-                if (pel.text != null) {
-                    Text text = pel.text;
-                    savedCanvas.save();
-                    savedCanvas.translate(pel.transDx, pel.transDy);
-                    savedCanvas.scale(pel.scale, pel.scale, text.getCenterPoint().x, text.getCenterPoint().y);
-                    savedCanvas.rotate(pel.degree, text.getCenterPoint().x, text.getCenterPoint().y);
-                    savedCanvas.drawText(text.getContent(), text.getBeginPoint().x, text.getBeginPoint().y, text.getPaint());
-                    savedCanvas.restore();
-                }
-                //图标图元
-                else if (pel.picture != null) {
-                    Picture picture = pel.picture;
-                    savedCanvas.save();
-                    savedCanvas.translate(pel.transDx, pel.transDy);
-                    savedCanvas.scale(pel.scale, pel.scale, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    savedCanvas.rotate(pel.degree, picture.getCenterPoint().x, picture.getCenterPoint().y);
-                    savedCanvas.drawBitmap(picture.createContent(), picture.getBeginPoint().x, picture.getBeginPoint().y, CanvasView.drawPicturePaint);
-                    savedCanvas.restore();
-                }
-                //路径
-                else
-                    savedCanvas.drawPath(pel.path, pel.paint);
+                pel.drawObject(savedCanvas);
             }
         }
     }

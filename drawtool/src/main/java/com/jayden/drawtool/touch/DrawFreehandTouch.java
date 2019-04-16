@@ -3,7 +3,7 @@ package com.jayden.drawtool.touch;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 
 /**

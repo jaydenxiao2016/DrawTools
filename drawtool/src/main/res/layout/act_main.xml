@@ -5,7 +5,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-    <com.jayden.drawtool.ui.CanvasView
+    <com.jayden.drawtool.ui.view.CanvasView
         android:id="@+id/vi_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

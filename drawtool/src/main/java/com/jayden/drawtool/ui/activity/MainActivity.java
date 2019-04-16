@@ -51,7 +51,7 @@ import com.jayden.drawtool.touch.DrawRectTouch;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.touch.Touch;
 import com.jayden.drawtool.touch.TransformTouch;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.dialog.ColorpickerDialog;
 import com.jayden.drawtool.ui.dialog.PenDialog;
 import com.jayden.drawtool.ui.dialog.PictureDialog;

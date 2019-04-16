@@ -3,7 +3,7 @@ package com.jayden.drawtool.step;
 import android.graphics.Matrix;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
 
 import java.util.List;

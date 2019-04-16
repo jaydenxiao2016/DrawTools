@@ -1,8 +1,11 @@
 package com.jayden.drawtool.bean;
 
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Region;
+
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 类名：Pel.java
@@ -52,10 +55,10 @@ public class Pel extends BasePel {
         (pel.path).set(path);
         (pel.region).set(new Region(region));
         (pel.paint).set(new Paint(paint));
-        if(text!=null) {
+        if (text != null) {
             pel.text = new Text(text.getContent(), text.getCenterPoint(), text.getBeginPoint());
         }
-        if(picture!=null) {
+        if (picture != null) {
             pel.picture = new Picture(picture.getContentId(), picture.getCenterPoint(), picture.getBeginPoint());
             pel.picture.createContent();
         }
@@ -64,7 +67,37 @@ public class Pel extends BasePel {
         pel.scale = scale;
         pel.degree = degree;
         pel.closure = closure;
-
         return pel;
     }
+
+    /**
+     * 在画布上作画
+     *
+     * @param canvas
+     */
+    public void drawObject(Canvas canvas) {
+        //文本图元
+        if (text != null) {
+            canvas.save();
+            canvas.translate(transDx, transDy);
+            canvas.scale(scale, scale, text.getCenterPoint().x, text.getCenterPoint().y);
+            canvas.rotate(degree, text.getCenterPoint().x, text.getCenterPoint().y);
+            canvas.drawText(text.getContent(), text.getBeginPoint().x, text.getBeginPoint().y, text.getPaint());
+            canvas.restore();
+        }
+        //图标图元
+        else if (picture != null) {
+            canvas.save();
+            canvas.translate(transDx, transDy);
+            canvas.scale(scale, scale, picture.getCenterPoint().x, picture.getCenterPoint().y);
+            canvas.rotate(degree, picture.getCenterPoint().x, picture.getCenterPoint().y);
+            canvas.drawBitmap(picture.createContent(), picture.getBeginPoint().x, picture.getBeginPoint().y, CanvasView.drawPicturePaint);
+            canvas.restore();
+        }
+        //路径
+        else {
+            canvas.drawPath(path, paint);
+        }
+    }
+
 }

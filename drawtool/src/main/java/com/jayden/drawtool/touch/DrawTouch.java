@@ -6,7 +6,7 @@ import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.step.DrawpelStep;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
 
 

@@ -4,7 +4,7 @@ import android.graphics.Matrix;
 import android.graphics.Region;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 
 //变换图元步骤

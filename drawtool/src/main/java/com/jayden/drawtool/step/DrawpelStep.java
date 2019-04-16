@@ -1,7 +1,7 @@
 package com.jayden.drawtool.step;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.List;
 

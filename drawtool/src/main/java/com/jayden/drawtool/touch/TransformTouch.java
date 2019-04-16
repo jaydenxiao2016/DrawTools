@@ -12,7 +12,7 @@ import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.step.TransformpelStep;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.ListIterator;
 

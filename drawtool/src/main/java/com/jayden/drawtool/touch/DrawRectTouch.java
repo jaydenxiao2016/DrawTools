@@ -4,7 +4,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 画矩阵

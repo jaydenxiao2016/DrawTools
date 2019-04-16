@@ -1,7 +1,7 @@
 package com.jayden.drawtool.touch;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.CanvasView;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 画线
