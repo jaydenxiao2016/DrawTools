@@ -34,7 +34,8 @@ public class ColorpickerDialog extends Dialog implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.dialog_colorpicker);
-
+        setCanceledOnTouchOutside(true);
+        setCancelable(true);
         initView();
         initData();
     }
@@ -67,10 +68,6 @@ public class ColorpickerDialog extends Dialog implements OnClickListener {
         if (i == R.id.btn_colorpicker_ok) {
             int curColor = picker.getColor();
             DrawTouch.getCurPaint().setColor(curColor);//设置当前颜色(MainActivity.colorBtn).setTextColor(curColor);//改变颜色二字if(DrawTextActivity.drawTextVi != null)//是在编辑文字界面打开的
-//            {
-//                (DrawTextView.drawTextPaint).setColor(curColor);
-//                (DrawTextActivity.drawTextVi).invalidate();
-//            }
             this.dismiss();//关闭对话框
         }
     }

@@ -1,6 +1,5 @@
 package com.jayden.drawtool.ui.activity;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,7 +18,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -51,10 +51,10 @@ import com.jayden.drawtool.touch.DrawRectTouch;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.touch.Touch;
 import com.jayden.drawtool.touch.TransformTouch;
-import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.dialog.ColorpickerDialog;
 import com.jayden.drawtool.ui.dialog.PenDialog;
 import com.jayden.drawtool.ui.dialog.PictureDialog;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +71,7 @@ import java.util.Stack;
  * 创建时间：2019/4/10
  * 最后修改时间：2019/4/10
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
     /*************************************************/
     private String softDir = "/DrawTools";
     public static Context context;
@@ -290,6 +290,7 @@ public class MainActivity extends FragmentActivity {
         if (transbarLinlayout.getVisibility() == View.VISIBLE) //如果变换箱为打开状态
             transbarLinlayout.setVisibility(View.GONE);//关闭
 
+        extendBtn.setVisibility(View.GONE);
         //弹出上下工具栏的动画
         Animation downAppearAnim = AnimationUtils.loadAnimation(context, R.anim.downappear);
         Animation topAppearAnim = AnimationUtils.loadAnimation(context, R.anim.topappear);
@@ -379,7 +380,7 @@ public class MainActivity extends FragmentActivity {
 
         //实例化确认对话框
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setIcon(android.R.drawable.ic_dialog_info);
+        dialog.setTitle("提示");
         dialog.setView(editTxt);
         dialog.setMessage("请输入文本");
         dialog.setPositiveButton("确定", new okClick());
@@ -861,6 +862,7 @@ public class MainActivity extends FragmentActivity {
                     {
                         //询问用户是否覆盖提示框
                         AlertDialog.Builder dialog1 = new AlertDialog.Builder(MainActivity.this);
+                        dialog1.setTitle("提示");
                         dialog1.setIcon(android.R.drawable.ic_dialog_info);
                         dialog1.setMessage("该名称已存在，是否覆盖？");
                         dialog1.setPositiveButton("覆盖", new DialogInterface.OnClickListener() {
@@ -900,6 +902,7 @@ public class MainActivity extends FragmentActivity {
 
         //实例化确认对话框
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+        dialog.setTitle("提示");
         dialog.setMessage("给您的作品取个名字吧~");
         dialog.setView(editTxt);
         dialog.setPositiveButton("保存", new okClick());

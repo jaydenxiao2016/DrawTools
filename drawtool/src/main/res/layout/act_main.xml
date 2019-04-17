@@ -14,8 +14,8 @@
 
     <Button
         android:id="@+id/btn_extend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/btn_extend_normal"
@@ -27,8 +27,8 @@
         android:id="@+id/frameLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true">
 
         <LinearLayout
             android:id="@+id/linlay_transbar"
@@ -169,8 +169,8 @@
             style="@style/DrawToolButton"
             android:drawableTop="@drawable/btn_processing_normal"
             android:onClick="onOpenProcessingbarBtn"
-            android:visibility="gone"
-            android:text="@string/tools_bottomtitle_txt_openprocessingbar"/>
+            android:text="@string/tools_bottomtitle_txt_openprocessingbar"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_clear"
@@ -214,8 +214,8 @@
             style="@style/DrawToolButton"
             android:drawableTop="@drawable/btn_setbg_normal"
             android:onClick="onOpenCanvasbgbarBtn"
-            android:visibility="gone"
-            android:text="@string/tools_bottomtitle_txt_opencanvasbgbar"/>
+            android:text="@string/tools_bottomtitle_txt_opencanvasbgbar"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_opendrawtext"

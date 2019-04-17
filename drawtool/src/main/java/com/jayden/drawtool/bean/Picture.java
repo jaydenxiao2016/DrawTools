@@ -13,6 +13,12 @@ public class Picture {
     private Bitmap content;
     private PointF centerPoint;
     private PointF beginPoint;
+    private String name;
+
+    public Picture(int contentId, String name) {
+        this.contentId = contentId;
+        this.name = name;
+    }
 
     public Picture(int contentId, PointF centerPoint, PointF beginPoint) {
         this.contentId = contentId;
@@ -59,5 +65,13 @@ public class Picture {
 
     public void setBeginPoint(PointF beginPoint) {
         this.beginPoint = beginPoint;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

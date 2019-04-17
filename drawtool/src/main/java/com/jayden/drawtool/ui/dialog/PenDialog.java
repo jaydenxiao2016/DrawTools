@@ -57,7 +57,8 @@ public class PenDialog extends Dialog implements OnClickListener,OnSeekBarChange
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.dialog_pen);
-
+		setCanceledOnTouchOutside(true);
+		setCancelable(true);
 		initView();
 		initData();
 	}

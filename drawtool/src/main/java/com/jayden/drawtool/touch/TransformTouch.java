@@ -206,14 +206,16 @@ public class TransformTouch extends Touch {
         if ((disx > 2f || disy > 2f) && step != null) //移动距离至少要满足大于2f
         {
             //敲定当前对应步骤
-            oridx = dx;
-            oridy = dy;
-            step.setToUndoMatrix(transMatrix);//设置进行该次步骤后的变换因子
-            step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
-            undoStack.push(step);//将该“步”压入undo栈
-            // 敲定此次操作的最终区域
-            if (selectedPel != null)
-                (savedPel.path).set(selectedPel.path); //初始位置也同步更新
+            if(selectedPel!=null) {
+                oridx = dx;
+                oridy = dy;
+                step.setToUndoMatrix(transMatrix);//设置进行该次步骤后的变换因子
+                step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
+                undoStack.push(step);//将该“步”压入undo栈
+                // 敲定此次操作的最终区域
+                if (selectedPel != null)
+                    (savedPel.path).set(selectedPel.path); //初始位置也同步更新
+            }
         }
 
         mode = NONE;
@@ -236,6 +238,7 @@ public class TransformTouch extends Touch {
         //初始化原有偏移，偏移是累计的
         oridx = selectedPel.transDx;
         oridy = selectedPel.transDy;
+        scale = selectedPel.scale;
 
         // 获取选中图元的初始matrix
         cachedMatrix = new Matrix();
