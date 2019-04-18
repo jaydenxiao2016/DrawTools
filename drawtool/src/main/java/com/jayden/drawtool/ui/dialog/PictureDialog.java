@@ -48,6 +48,8 @@ public class PictureDialog extends Dialog {
         pictureList.add(new Picture(R.drawable.ic_picture_y_road, "Y型路"));
         pictureList.add(new Picture(R.drawable.ic_picture_crossroads, "十字路"));
         pictureList.add(new Picture(R.drawable.ic_picture_three_road, "三向路"));
+//        pictureList.add(new Picture(R.drawable.ic_picture_1, "电阻器"));
+//        pictureList.add(new Picture(R.drawable.ic_picture_2, "电位器"));
         adapter = new PictureAdapter(getContext());
         adapter.setData(pictureList);
         gridView.setAdapter(adapter);

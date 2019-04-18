@@ -144,7 +144,7 @@ public class CanvasView extends View {
 
         drawTextPaint = new Paint();
         drawTextPaint.setColor(DrawTouch.getCurPaint().getColor());
-        drawTextPaint.setTextSize(30);
+        drawTextPaint.setTextSize(50);
         drawTextPaint.setAntiAlias(true);
         drawTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         drawPicturePaint = new Paint();
@@ -181,7 +181,7 @@ public class CanvasView extends View {
                 //拖曳图标
                 canvas.drawBitmap(selectedPel.dragBitmap, selectedPel.dragBtnRect.left, selectedPel.dragBtnRect.top, drawPicturePaint);
 
-                invalidate();// 画笔动画效果
+                invalidate();
             } else //画图状态不产生动态画笔效果
             {
                 canvas.drawPath(selectedPel.path, drawPelPaint);

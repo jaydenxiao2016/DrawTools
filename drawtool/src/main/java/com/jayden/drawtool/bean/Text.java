@@ -30,7 +30,7 @@ public class Text {
         (this.beginPoint).set(beginPoint);
         paint = new Paint();
         paint.setColor(DrawTouch.getCurPaint().getColor());
-        paint.setTextSize(30);
+        paint.setTextSize(50);
         paint.setAntiAlias(true);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
     }

@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
+import android.util.Log;
 
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
@@ -34,7 +35,7 @@ public class TransformTouch extends Touch {
     private static final int TRANSLATE = 2; // 平移操作
     private static int mode = NONE; // 当前操作类型
     private float dx, dy, oridx, oridy; //平移偏移量
-    private float scale; //缩放倍数
+    private float scale,oriScale; //缩放倍数
     private float degree;//旋转量
     private static final float MIN_ZOOM = 0.3f; //缩放下限
 
@@ -166,7 +167,6 @@ public class TransformTouch extends Touch {
                 matrixCheck();
             } else if (mode == DRAG) // 缩放旋转操作
             {
-
                 cachedMatrix = new Matrix();
                 //开始位置
                 cachedMatrix.setTranslate(originalRect.left, originalRect.top);
@@ -179,7 +179,6 @@ public class TransformTouch extends Touch {
                 degree = getAngle(centerPoint, downPoint, curPoint);
                 cachedMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
                 transMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
-
                 selectedPel.scale = scale;
                 selectedPel.degree = degree;
                 //文本
@@ -209,6 +208,7 @@ public class TransformTouch extends Touch {
             if(selectedPel!=null) {
                 oridx = dx;
                 oridy = dy;
+                Log.e("jaydenxiao","oriScale:"+oriScale+"");
                 step.setToUndoMatrix(transMatrix);//设置进行该次步骤后的变换因子
                 step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
                 undoStack.push(step);//将该“步”压入undo栈
@@ -238,7 +238,7 @@ public class TransformTouch extends Touch {
         //初始化原有偏移，偏移是累计的
         oridx = selectedPel.transDx;
         oridy = selectedPel.transDy;
-        scale = selectedPel.scale;
+        oriScale = selectedPel.scale;
 
         // 获取选中图元的初始matrix
         cachedMatrix = new Matrix();
@@ -390,5 +390,4 @@ public class TransformTouch extends Touch {
 
         return new PointF((boundRect.right + boundRect.left) / 2, (boundRect.bottom + boundRect.top) / 2);
     }
-
 }
