@@ -4,8 +4,8 @@ import android.graphics.PointF;
 import android.util.Log;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 画贝塞尔曲线
@@ -28,6 +28,7 @@ public class DrawBesselTouch extends DrawTouch {
         {
             beginPoint.set(downPoint); //记录起点
             newPel = new Pel();
+            newPel.type = 12;
         }
     }
 
@@ -63,15 +64,18 @@ public class DrawBesselTouch extends DrawTouch {
             control = true;
         } else {
             newPel.closure = false;
+            //路径组成的点
+            newPel.pathPointFList.add(beginPoint);
+            newPel.pathPointFList.add(movePoint);
+            newPel.pathPointFList.add(endPoint);
             super.up(); //最终敲定
-
             control = false;
         }
     }
 
     public void ifNeedToOpenTools() {
         if (dis < 10f) {
-            Log.v("v", "ttttttttttttttttttttt");
+            Log.v("v", "ttttttttttttttttttttt" );
             dis = 0;
             MainActivity.openTools();
             control = true;

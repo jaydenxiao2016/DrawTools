@@ -35,7 +35,7 @@ public class TransformTouch extends Touch {
     private static final int TRANSLATE = 2; // 平移操作
     private static int mode = NONE; // 当前操作类型
     private float dx, dy, oridx, oridy; //平移偏移量
-    private float scale,oriScale; //缩放倍数
+    private float scale, oriScale; //缩放倍数
     private float degree;//旋转量
     private static final float MIN_ZOOM = 0.3f; //缩放下限
 
@@ -154,15 +154,9 @@ public class TransformTouch extends Touch {
                 //累计偏移量
                 selectedPel.transDx = dx;
                 selectedPel.transDy = dy;
-                //文本
-                if (selectedPel.path != null && selectedPel.text == null && selectedPel.picture == null) {
-                    (selectedPel.path).set(savedPel.path);
-                    (selectedPel.path).transform(transMatrix); // 作用于图元
-                    (selectedPel.region).setPath(selectedPel.path, clipRegion); // 更新平移后路径所在区域
-                } else {
-                    reSetDstRect(transMatrix, contentRect, originalRect);
-                    selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
-                }
+
+                reSetDstRect(transMatrix, contentRect, originalRect);
+                selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
                 //重新检查
                 matrixCheck();
             } else if (mode == DRAG) // 缩放旋转操作
@@ -179,28 +173,21 @@ public class TransformTouch extends Touch {
                 degree = getAngle(centerPoint, downPoint, curPoint);
                 cachedMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
                 transMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
-                //文本
-                if (selectedPel.path != null && selectedPel.text == null && selectedPel.picture == null) {
-                    (selectedPel.path).set(savedPel.path);
-                    (selectedPel.path).transform(transMatrix); // 作用于图元
-                    (selectedPel.region).setPath(selectedPel.path, clipRegion); // 更新平移后路径所在区域
-                }
-                //图片或文字
-                else {
-                    //累计缩放倍数
-                    selectedPel.scale = getScale(centerPoint,
-                            new PointF(selectedPel.bottomRightPointF.x+selectedPel.transDx,
-                                    selectedPel.bottomRightPointF.y+selectedPel.transDy),
-                            curPoint);
-                    //累计旋转角度
-                    selectedPel.degree = getAngle(centerPoint,
-                            new PointF(selectedPel.bottomRightPointF.x+selectedPel.transDx,
-                                    selectedPel.bottomRightPointF.y+selectedPel.transDy),
-                            curPoint);
-                    Log.e("jaydenxiao",selectedPel.degree+"");
-                    reSetDstRect(transMatrix, contentRect, originalRect);
-                    selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
-                }
+
+                //累计缩放倍数
+                selectedPel.scale = getScale(centerPoint,
+                        new PointF(selectedPel.bottomRightPointF.x + selectedPel.transDx,
+                                selectedPel.bottomRightPointF.y + selectedPel.transDy),
+                        curPoint);
+                //累计旋转角度
+                selectedPel.degree = getAngle(centerPoint,
+                        new PointF(selectedPel.bottomRightPointF.x + selectedPel.transDx,
+                                selectedPel.bottomRightPointF.y + selectedPel.transDy),
+                        curPoint);
+
+                Log.e("jaydenxiao", selectedPel.degree + "" );
+                reSetDstRect(transMatrix, contentRect, originalRect);
+                selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
 
                 matrixCheck();
             }
@@ -216,10 +203,10 @@ public class TransformTouch extends Touch {
         if ((disx > 2f || disy > 2f) && step != null) //移动距离至少要满足大于2f
         {
             //敲定当前对应步骤
-            if(selectedPel!=null) {
+            if (selectedPel != null) {
                 oridx = dx;
                 oridy = dy;
-                Log.e("jaydenxiao","oriScale:"+oriScale+"");
+                Log.e("jaydenxiao", "oriScale:" + oriScale + "" );
                 step.setToUndoMatrix(transMatrix);//设置进行该次步骤后的变换因子
                 step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
                 undoStack.push(step);//将该“步”压入undo栈
@@ -244,7 +231,7 @@ public class TransformTouch extends Touch {
         selectedPel.leftBottomPoint = new PointF();
         selectedPel.leftTopPoint = new PointF();
         selectedPel.rightTopPoint = new PointF();
-        selectedPel.rigintBottomPoint = new PointF();
+        selectedPel.rightBottomPoint = new PointF();
         selectedPel.dragBtnRect = new RectF();
         //初始化原有偏移，偏移是累计的
         oridx = selectedPel.transDx;
@@ -289,7 +276,7 @@ public class TransformTouch extends Touch {
         PointF pointF = new PointF(pointX, pointY);
         PointF[] vertexPointFs = new PointF[]{selectedPel.leftTopPoint,
                 selectedPel.rightTopPoint,
-                selectedPel.rigintBottomPoint,
+                selectedPel.rightBottomPoint,
                 selectedPel.leftBottomPoint};
         int nCross = 0;
         for (int i = 0; i < vertexPointFs.length; i++) {
@@ -343,18 +330,18 @@ public class TransformTouch extends Touch {
         selectedPel.rightTopPoint.y = f[3] * originalRegionWidth + f[4] * 0 + f[5];
         selectedPel.leftBottomPoint.x = f[0] * 0 + f[1] * originalRegionHeight + f[2];
         selectedPel.leftBottomPoint.y = f[3] * 0 + f[4] * originalRegionHeight + f[5];
-        selectedPel.rigintBottomPoint.x = f[0] * originalRegionWidth + f[1] * originalRegionHeight + f[2];
-        selectedPel.rigintBottomPoint.y = f[3] * originalRegionWidth + f[4] * originalRegionHeight + f[5];
+        selectedPel.rightBottomPoint.x = f[0] * originalRegionWidth + f[1] * originalRegionHeight + f[2];
+        selectedPel.rightBottomPoint.y = f[3] * originalRegionWidth + f[4] * originalRegionHeight + f[5];
     }
 
     /**
      * 重新获取拖动按钮实际所在区域
      */
     private void reSetDragBtnRect() {
-        selectedPel.dragBtnRect = new RectF(selectedPel.rigintBottomPoint.x - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
-                selectedPel.rigintBottomPoint.y - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
-                selectedPel.rigintBottomPoint.x + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
-                selectedPel.rigintBottomPoint.y + (selectedPel.dragBitmap.getHeight() * 1.0f / 2));
+        selectedPel.dragBtnRect = new RectF(selectedPel.rightBottomPoint.x - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
+                selectedPel.rightBottomPoint.y - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
+                selectedPel.rightBottomPoint.x + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
+                selectedPel.rightBottomPoint.y + (selectedPel.dragBitmap.getHeight() * 1.0f / 2));
     }
 
     /**

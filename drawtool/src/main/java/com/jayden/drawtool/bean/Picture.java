@@ -3,7 +3,6 @@ package com.jayden.drawtool.bean;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PointF;
 
 import com.jayden.drawtool.ui.activity.MainActivity;
 
@@ -11,8 +10,6 @@ import com.jayden.drawtool.ui.activity.MainActivity;
 public class Picture {
     private int contentId;
     private Bitmap content;
-    private PointF centerPoint;
-    private PointF beginPoint;
     private String name;
 
     public Picture(int contentId, String name) {
@@ -20,12 +17,8 @@ public class Picture {
         this.name = name;
     }
 
-    public Picture(int contentId, PointF centerPoint, PointF beginPoint) {
+    public Picture(int contentId) {
         this.contentId = contentId;
-        this.centerPoint = new PointF();
-        (this.centerPoint).set(centerPoint);
-        this.beginPoint = new PointF();
-        (this.beginPoint).set(beginPoint);
     }
 
     public Bitmap createContent() {
@@ -34,14 +27,6 @@ public class Picture {
         return content;
     }
 
-
-    public PointF getCenterPoint() {
-        return centerPoint;
-    }
-
-    public PointF getBeginPoint() {
-        return beginPoint;
-    }
 
     public int getContentId() {
         return contentId;
@@ -59,13 +44,6 @@ public class Picture {
         this.content = content;
     }
 
-    public void setCenterPoint(PointF centerPoint) {
-        this.centerPoint = centerPoint;
-    }
-
-    public void setBeginPoint(PointF beginPoint) {
-        this.beginPoint = beginPoint;
-    }
 
     public String getName() {
         return name;

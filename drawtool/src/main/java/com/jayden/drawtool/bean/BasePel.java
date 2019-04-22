@@ -26,7 +26,7 @@ public class BasePel {
     /**
      * 右下角
      */
-    public PointF rigintBottomPoint;
+    public PointF rightBottomPoint;
     /**
      * 左下角
      */
@@ -52,10 +52,30 @@ public class BasePel {
     /**
      * 放大倍数
      */
-    public float scale=1;
+    public float scale = 1;
     /**
      * 旋转角度
      */
     public float degree;
+    /**
+     * 中心点
+     */
+    public PointF centerPoint;
+    /**
+     * 开始点
+     */
+    public PointF beginPoint;
+    /**
+     * 最初区域右下角坐标
+     */
+    public PointF bottomRightPointF;
+    /**
+     * 画笔颜色
+     */
+    public int paintColor;
+    /**
+     * 画笔宽度
+     */
+    public float paintStrokeWidth;
 
 }

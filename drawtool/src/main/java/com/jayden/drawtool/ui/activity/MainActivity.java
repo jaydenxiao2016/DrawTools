@@ -55,6 +55,7 @@ import com.jayden.drawtool.ui.dialog.ColorpickerDialog;
 import com.jayden.drawtool.ui.dialog.PenDialog;
 import com.jayden.drawtool.ui.dialog.PictureDialog;
 import com.jayden.drawtool.ui.view.CanvasView;
+import com.jayden.drawtool.utils.TimeUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private String softDir = "/DrawTools";
     public static Context context;
     public static int SCREEN_WIDTH, SCREEN_HEIGHT;
-    private String savedPath;
+    private String savedImagePath;
 
     //内部算法
     private List<Pel> pelList;
@@ -356,10 +357,13 @@ public class MainActivity extends AppCompatActivity {
                 Region region = new Region();
                 region.set((int) beginPoint.x, (int) beginPoint.y - rect.height(), (int) (beginPoint.x + rect.width()), (int) (beginPoint.y) + 10);
 
-                Text text = new Text(content, centerPoint, beginPoint);
+                Text text = new Text(content);
                 Pel newPel = new Pel();
+                newPel.type = 20;
                 newPel.text = text;
                 newPel.region = region;
+                newPel.beginPoint = beginPoint;
+                newPel.centerPoint = centerPoint;
                 newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
@@ -400,15 +404,17 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap content = BitmapFactory.decodeResource(MainActivity.getContext().getResources(),
                         contentId);
                 centerPoint.set(beginPoint.x + content.getWidth() / 2, beginPoint.y + content.getHeight() / 2);
-                Picture picture = new Picture(contentId, new PointF(centerPoint.x, centerPoint.y),
-                        new PointF(beginPoint.x, beginPoint.y));
+                Picture picture = new Picture(contentId);
                 //文本区域
                 Region region = new Region();
                 region.set((int) beginPoint.x, (int) beginPoint.y, (int) (beginPoint.x + content.getWidth()), (int) (beginPoint.y) + content.getHeight());
 
                 Pel newPel = new Pel();
+                newPel.type = 30;
                 newPel.picture = picture;
                 newPel.region = region;
+                newPel.beginPoint = new PointF(beginPoint.x, beginPoint.y);
+                newPel.centerPoint = new PointF(centerPoint.x, centerPoint.y);
                 newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
@@ -480,16 +486,16 @@ public class MainActivity extends AppCompatActivity {
         {
             Pel pel = (Pel) (selectedPel).clone();//以选中图元为模型，拷贝一个新对象
             if (pel.text != null) {
-                PointF beginPoint = pel.text.getBeginPoint();
-                PointF centerPoint = pel.text.getCenterPoint();
+                PointF beginPoint = pel.beginPoint;
+                PointF centerPoint = pel.centerPoint;
                 Region region = pel.region;
                 Rect bounds = region.getBounds();
                 beginPoint.offset(10, 10);
                 centerPoint.offset(10, 10);
                 region.set(bounds.left + 10, bounds.top + 10, bounds.right + 10, bounds.bottom + 10);
             } else if (pel.picture != null) {
-                PointF beginPoint = pel.picture.getBeginPoint();
-                PointF centerPoint = pel.picture.getCenterPoint();
+                PointF beginPoint = pel.beginPoint;
+                PointF centerPoint = pel.centerPoint;
                 Region region = pel.region;
                 Rect bounds = region.getBounds();
                 beginPoint.offset(10, 10);
@@ -843,74 +849,53 @@ public class MainActivity extends AppCompatActivity {
 
     //保存
     public void onSaveBtn(final View v) {
-        final EditText editTxt = new EditText(MainActivity.this);//作品的名称编辑框
-        //弹出编辑对话框
-        class okClick implements DialogInterface.OnClickListener {
-            public void onClick(DialogInterface dialog, int which) //ok
+        try {
+            savedImagePath = Environment.getExternalStorageDirectory().getPath() + softDir + "/" + TimeUtils.getCurrentDate(TimeUtils.dateFormatYMDHMS) + ".jpg";
+            File file = new File(savedImagePath);
+            if (!file.exists()) //文件不存在
             {
-                try {
-                    savedPath = Environment.getExternalStorageDirectory().getPath() + softDir + "/" + editTxt.getText().toString() + ".jpg";
-                    File file = new File(savedPath);
+                //保存图片
+                Bitmap bitmap = CanvasView.getSavedBitmap();
+                FileOutputStream fileOutputStream = new FileOutputStream(savedImagePath);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                fileOutputStream.close();
+                //保存and数据文件
 
-                    if (!file.exists()) //文件不存在
-                    {
-                        Bitmap bitmap = CanvasView.getSavedBitmap();
-                        FileOutputStream fileOutputStream = new FileOutputStream(savedPath);
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                        fileOutputStream.close();
-
-                        Toast.makeText(MainActivity.this, "图片已保存在(" + savedPath + ")", Toast.LENGTH_SHORT).show();
-                    } else //文件存在
-                    {
-                        //询问用户是否覆盖提示框
-                        AlertDialog.Builder dialog1 = new AlertDialog.Builder(MainActivity.this);
-                        dialog1.setTitle("提示");
-                        dialog1.setIcon(android.R.drawable.ic_dialog_info);
-                        dialog1.setMessage("该名称已存在，是否覆盖？");
-                        dialog1.setPositiveButton("覆盖", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    Bitmap bitmap = CanvasView.getSavedBitmap();
-                                    FileOutputStream fileOutputStream = new FileOutputStream(savedPath);
-                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                                    try {
-                                        fileOutputStream.close();
-                                        Toast.makeText(MainActivity.this, "图片已保存(" + savedPath + ")", Toast.LENGTH_SHORT).show();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
+                Toast.makeText(MainActivity.this, "图片已保存在(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
+            } else //文件存在
+            {
+                //询问用户是否覆盖提示框
+                AlertDialog.Builder dialog1 = new AlertDialog.Builder(MainActivity.this);
+                dialog1.setTitle("提示");
+                dialog1.setIcon(android.R.drawable.ic_dialog_info);
+                dialog1.setMessage("该名称已存在，是否覆盖？");
+                dialog1.setPositiveButton("覆盖", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            Bitmap bitmap = CanvasView.getSavedBitmap();
+                            FileOutputStream fileOutputStream = new FileOutputStream(savedImagePath);
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                            try {
+                                fileOutputStream.close();
+                                Toast.makeText(MainActivity.this, "图片已保存(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                        });
-                        dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        dialog1.create();
-                        dialog1.show();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                });
+                dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                dialog1.create();
+                dialog1.show();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        class cancelClick implements DialogInterface.OnClickListener //cancel
-        {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        }
-
-        //实例化确认对话框
-        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-        dialog.setTitle("提示");
-        dialog.setMessage("给您的作品取个名字吧~");
-        dialog.setView(editTxt);
-        dialog.setPositiveButton("保存", new okClick());
-        dialog.setNegativeButton("取消", new cancelClick());
-        dialog.create();
-        dialog.show();
     }
 
     //换背景

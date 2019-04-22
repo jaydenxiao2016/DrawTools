@@ -26,6 +26,7 @@ public class DrawFreehandTouch extends DrawTouch
 		lastPoint.set(downPoint);
 
 		newPel=new Pel();
+		newPel.type=10;
 		(newPel.path).moveTo(lastPoint.x, lastPoint.y);
 	}
 
@@ -45,6 +46,9 @@ public class DrawFreehandTouch extends DrawTouch
 	public void up()
 	{
 		newPel.closure=true;
+		//路径组成的点
+		newPel.pathPointFList.add(lastPoint);
+		newPel.pathPointFList.add(new PointF((lastPoint.x+movePoint.x)/2,(lastPoint.y+movePoint.y)/2));
 		super.up();
 	}
 }

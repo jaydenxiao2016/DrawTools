@@ -8,6 +8,9 @@ import android.graphics.Region;
 
 import com.jayden.drawtool.ui.view.CanvasView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 类名：Pel.java
  * 描述：图元类
@@ -17,21 +20,28 @@ import com.jayden.drawtool.ui.view.CanvasView;
  */
 public class Pel extends BasePel {
     /**
-     * 路径
-     */
-    public Path path;
-    /**
      * 区域
      */
     public Region region;
     /**
-     * 最初区域右下角坐标
-     */
-    public PointF bottomRightPointF;
-    /**
      * /画笔
      */
     public Paint paint;
+    /**
+     * 路径
+     */
+    public Path path;
+    /**
+     * 类型
+     * path类型：10:自由线 11：矩型 12：塞尔曲线 13：圆 14：直线 15：多重折线 16：多边形
+     * 文本类型：20
+     * 照片类型：30
+     */
+    public int type;
+    /**
+     * 组成path的所有点
+     */
+    public List<PointF> pathPointFList;
     /**
      * 文本
      */
@@ -40,6 +50,7 @@ public class Pel extends BasePel {
      * 插画
      */
     public Picture picture;
+
     /**
      * 是否封闭
      */
@@ -47,10 +58,12 @@ public class Pel extends BasePel {
 
     //构造（实际使用时应该把Pel构造成Pel(path region paint name)的形式，形参均在外部都已经定义好了的）
     public Pel() {
+        pathPointFList=new ArrayList<>();
         path = new Path();
         region = new Region();
         paint = new Paint();
-        bottomRightPointF=new PointF();
+        centerPoint = new PointF();
+        bottomRightPointF = new PointF();
         text = null;
         picture = null;
     }
@@ -61,14 +74,16 @@ public class Pel extends BasePel {
         (pel.path).set(path);
         (pel.region).set(new Region(region));
         (pel.paint).set(new Paint(paint));
-        (pel.bottomRightPointF).set(new PointF(bottomRightPointF.x,bottomRightPointF.y));
         if (text != null) {
-            pel.text = new Text(text.getContent(), text.getCenterPoint(), text.getBeginPoint());
+            pel.text = new Text(text.getContent());
         }
         if (picture != null) {
-            pel.picture = new Picture(picture.getContentId(), picture.getCenterPoint(), picture.getBeginPoint());
+            pel.picture = new Picture(picture.getContentId());
             pel.picture.createContent();
         }
+        pel.bottomRightPointF = bottomRightPointF;
+        pel.centerPoint = centerPoint;
+        pel.beginPoint = beginPoint;
         pel.transDx = transDx;
         pel.transDy = transDy;
         pel.scale = scale;
@@ -87,24 +102,30 @@ public class Pel extends BasePel {
         if (text != null) {
             canvas.save();
             canvas.translate(transDx, transDy);
-            canvas.scale(scale, scale, text.getCenterPoint().x, text.getCenterPoint().y);
-            canvas.rotate(degree, text.getCenterPoint().x, text.getCenterPoint().y);
-            canvas.drawText(text.getContent(), text.getBeginPoint().x, text.getBeginPoint().y, text.getPaint());
+            canvas.scale(scale, scale, centerPoint.x, centerPoint.y);
+            canvas.rotate(degree, centerPoint.x, centerPoint.y);
+            canvas.drawText(text.getContent(), beginPoint.x, beginPoint.y, text.getPaint());
             canvas.restore();
         }
         //图标图元
         else if (picture != null) {
             canvas.save();
             canvas.translate(transDx, transDy);
-            canvas.scale(scale, scale, picture.getCenterPoint().x, picture.getCenterPoint().y);
-            canvas.rotate(degree, picture.getCenterPoint().x, picture.getCenterPoint().y);
-            canvas.drawBitmap(picture.createContent(), picture.getBeginPoint().x, picture.getBeginPoint().y, CanvasView.drawPicturePaint);
+            canvas.scale(scale, scale, centerPoint.x, centerPoint.y);
+            canvas.rotate(degree, centerPoint.x, centerPoint.y);
+            canvas.drawBitmap(picture.createContent(), beginPoint.x, beginPoint.y, CanvasView.drawPicturePaint);
             canvas.restore();
         }
         //路径
         else {
+            canvas.save();
+            canvas.translate(transDx, transDy);
+            canvas.scale(scale, scale, centerPoint.x, centerPoint.y);
+            canvas.rotate(degree, centerPoint.x, centerPoint.y);
             canvas.drawPath(path, paint);
+            canvas.restore();
         }
+
     }
 
 }

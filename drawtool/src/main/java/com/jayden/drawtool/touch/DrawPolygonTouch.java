@@ -4,8 +4,8 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 画多边形
@@ -30,6 +30,7 @@ public class DrawPolygonTouch extends DrawTouch {
             beginPoint.set(downPoint);
 
             newPel = new Pel();
+            newPel.type = 16;
             (newPel.path).moveTo(beginPoint.x, beginPoint.y);
             lastPath.set(newPel.path);
 

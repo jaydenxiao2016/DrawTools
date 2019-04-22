@@ -28,6 +28,7 @@ public class DrawBrokenlineTouch extends DrawTouch {
             beginPoint.set(downPoint);
 
             newPel = new Pel();
+            newPel.type=15;
             (newPel.path).moveTo(beginPoint.x, beginPoint.y);
             lastPath.set(newPel.path);
 
@@ -57,6 +58,9 @@ public class DrawBrokenlineTouch extends DrawTouch {
 
             if (hasFinished == true) {
                 newPel.closure = false;
+                //路径组成的点
+                newPel.pathPointFList.add(beginPoint);
+                newPel.pathPointFList.add(movePoint);
                 super.up();
                 hasFinished = false;
                 firstDown = true;

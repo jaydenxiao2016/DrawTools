@@ -174,7 +174,7 @@ public class CanvasView extends View {
                 Path path = new Path();
                 path.moveTo(selectedPel.leftTopPoint.x, selectedPel.leftTopPoint.y);
                 path.lineTo(selectedPel.rightTopPoint.x, selectedPel.rightTopPoint.y);
-                path.lineTo(selectedPel.rigintBottomPoint.x, selectedPel.rigintBottomPoint.y);
+                path.lineTo(selectedPel.rightBottomPoint.x, selectedPel.rightBottomPoint.y);
                 path.lineTo(selectedPel.leftBottomPoint.x, selectedPel.leftBottomPoint.y);
                 path.lineTo(selectedPel.leftTopPoint.x, selectedPel.leftTopPoint.y);
                 canvas.drawPath(path, animPelPaint);
