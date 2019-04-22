@@ -3,6 +3,7 @@ package com.jayden.drawtool.bean;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.Region;
 
 import com.jayden.drawtool.ui.view.CanvasView;
@@ -23,6 +24,10 @@ public class Pel extends BasePel {
      * 区域
      */
     public Region region;
+    /**
+     * 最初区域右下角坐标
+     */
+    public PointF bottomRightPointF;
     /**
      * /画笔
      */
@@ -45,6 +50,7 @@ public class Pel extends BasePel {
         path = new Path();
         region = new Region();
         paint = new Paint();
+        bottomRightPointF=new PointF();
         text = null;
         picture = null;
     }
@@ -55,6 +61,7 @@ public class Pel extends BasePel {
         (pel.path).set(path);
         (pel.region).set(new Region(region));
         (pel.paint).set(new Paint(paint));
+        (pel.bottomRightPointF).set(new PointF(bottomRightPointF.x,bottomRightPointF.y));
         if (text != null) {
             pel.text = new Text(text.getContent(), text.getCenterPoint(), text.getBeginPoint());
         }

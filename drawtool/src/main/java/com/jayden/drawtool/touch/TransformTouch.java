@@ -151,7 +151,7 @@ public class TransformTouch extends Touch {
                 // 对选中图元施行平移变换
                 cachedMatrix.setTranslate(originalRect.left + (curPoint.x - downPoint.x), originalRect.top + (curPoint.y - downPoint.y)); // 作用于平移变换因子
                 transMatrix.setTranslate(curPoint.x - downPoint.x, curPoint.y - downPoint.y);
-
+                //累计偏移量
                 selectedPel.transDx = dx;
                 selectedPel.transDy = dy;
                 //文本
@@ -171,22 +171,33 @@ public class TransformTouch extends Touch {
                 //开始位置
                 cachedMatrix.setTranslate(originalRect.left, originalRect.top);
                 transMatrix = new Matrix();
-                //缩放倍数
+                //当前缩放倍数
                 scale = getScale(centerPoint, downPoint, curPoint);
                 cachedMatrix.postScale(scale, scale, centerPoint.x, centerPoint.y);// 縮放
                 transMatrix.postScale(scale, scale, centerPoint.x, centerPoint.y);// 縮放
-                //旋转角度
+                //当前旋转角度
                 degree = getAngle(centerPoint, downPoint, curPoint);
                 cachedMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
                 transMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
-                selectedPel.scale = scale;
-                selectedPel.degree = degree;
                 //文本
                 if (selectedPel.path != null && selectedPel.text == null && selectedPel.picture == null) {
                     (selectedPel.path).set(savedPel.path);
                     (selectedPel.path).transform(transMatrix); // 作用于图元
                     (selectedPel.region).setPath(selectedPel.path, clipRegion); // 更新平移后路径所在区域
-                } else {
+                }
+                //图片或文字
+                else {
+                    //累计缩放倍数
+                    selectedPel.scale = getScale(centerPoint,
+                            new PointF(selectedPel.bottomRightPointF.x+selectedPel.transDx,
+                                    selectedPel.bottomRightPointF.y+selectedPel.transDy),
+                            curPoint);
+                    //累计旋转角度
+                    selectedPel.degree = getAngle(centerPoint,
+                            new PointF(selectedPel.bottomRightPointF.x+selectedPel.transDx,
+                                    selectedPel.bottomRightPointF.y+selectedPel.transDy),
+                            curPoint);
+                    Log.e("jaydenxiao",selectedPel.degree+"");
                     reSetDstRect(transMatrix, contentRect, originalRect);
                     selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
                 }

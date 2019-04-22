@@ -360,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
                 Pel newPel = new Pel();
                 newPel.text = text;
                 newPel.region = region;
+                newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
                 (CanvasView.pelList).add(newPel);
@@ -408,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
                 Pel newPel = new Pel();
                 newPel.picture = picture;
                 newPel.region = region;
+                newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
                 (CanvasView.pelList).add(newPel);
