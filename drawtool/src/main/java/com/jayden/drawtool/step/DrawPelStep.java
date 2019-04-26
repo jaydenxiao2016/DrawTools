@@ -31,7 +31,7 @@ public class DrawPelStep extends Step {
     }
 
     @Override
-    public void setToUndoPel(Pel pel) {
+    void setToUndoPel(Pel pel) {
 
     }
 }

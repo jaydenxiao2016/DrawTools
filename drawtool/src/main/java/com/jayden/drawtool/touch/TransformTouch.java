@@ -10,7 +10,7 @@ import android.graphics.RectF;
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.step.Step;
-import com.jayden.drawtool.step.TransformpelStep;
+import com.jayden.drawtool.step.TransformPelStep;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.ListIterator;
@@ -225,7 +225,7 @@ public class TransformTouch extends Touch {
         //矩阵参数检查,设置4个点坐标
         matrixCheck();
         //由已知信息构造该步骤
-        step = new TransformpelStep(selectedPel);//设置该步骤对应图元
+        step = new TransformPelStep(selectedPel);//设置该步骤对应图元
     }
 
     /**

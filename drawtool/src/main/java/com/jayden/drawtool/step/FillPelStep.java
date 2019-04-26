@@ -6,11 +6,11 @@ import com.jayden.drawtool.bean.Pel;
 
 
 //填充图元步骤
-public class FillpelStep extends Step 
+public class FillPelStep extends Step
 {
 	private Paint oldPaint,newPaint;
 	
-	public FillpelStep(Pel pel, Paint oldPaint, Paint newPaint)
+	public FillPelStep(Pel pel, Paint oldPaint, Paint newPaint)
 	{
 		super(pel);
 		this.oldPaint=new Paint(oldPaint);
@@ -29,5 +29,10 @@ public class FillpelStep extends Step
 	{
 		(curPel.paint).set(oldPaint);
 		canvasVi.updateSavedBitmap();
+	}
+
+	@Override
+	public void setToUndoPel(Pel pel) {
+
 	}
 }

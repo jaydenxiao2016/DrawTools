@@ -442,7 +442,7 @@ public class CanvasView extends View {
     }
 
     /**
-     * 保存txt数据文件（读和取位置要一一对应）
+     * 保存and数据文件（读和取位置要一一对应）
      *
      * @param path
      */
@@ -531,7 +531,7 @@ public class CanvasView extends View {
     }
 
     /**
-     * 加载txt文件数据（读和取位置要一一对应）
+     * 加载and文件数据（读和取位置要一一对应）
      *
      * @param path
      */

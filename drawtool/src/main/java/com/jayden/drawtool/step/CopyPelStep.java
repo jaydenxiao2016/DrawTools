@@ -4,9 +4,9 @@ package com.jayden.drawtool.step;
 import com.jayden.drawtool.bean.Pel;
 
 //拷贝图元步骤
-public class CopypelStep extends DrawpelStep 
+public class CopyPelStep extends DrawPelStep
 {
-	public CopypelStep(Pel pel)
+	public CopyPelStep(Pel pel)
 	{
 		super(pel);
 	}

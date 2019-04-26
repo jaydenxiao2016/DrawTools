@@ -6,7 +6,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.step.DrawpelStep;
+import com.jayden.drawtool.step.DrawPelStep;
 import com.jayden.drawtool.ui.activity.MainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
@@ -76,7 +76,7 @@ public class DrawTouch extends Touch {
             pelList.add(newPel);
 
             //2.包装好当前步骤 内的操作
-            undoStack.push(new DrawpelStep(newPel));//将该“步”压入undo栈
+            undoStack.push(new DrawPelStep(newPel));//将该“步”压入undo栈
 
             //3.更新重绘位图
             CanvasView.setSelectedPel(selectedPel = null);//刚才画的图元失去焦点

@@ -37,10 +37,10 @@ import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.bean.Picture;
 import com.jayden.drawtool.bean.Text;
-import com.jayden.drawtool.step.CopypelStep;
-import com.jayden.drawtool.step.DeletepelStep;
-import com.jayden.drawtool.step.DrawpelStep;
-import com.jayden.drawtool.step.FillpelStep;
+import com.jayden.drawtool.step.CopyPelStep;
+import com.jayden.drawtool.step.DeletePelStep;
+import com.jayden.drawtool.step.DrawPelStep;
+import com.jayden.drawtool.step.FillPelStep;
 import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.touch.DrawBesselTouch;
 import com.jayden.drawtool.touch.DrawBrokenlineTouch;
@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                 (CanvasView.pelList).add(newPel);
 
                 //记录栈中信息
-                undoStack.push(new DrawpelStep(newPel));//将该“步”压入undo栈
+                undoStack.push(new DrawPelStep(newPel));//将该“步”压入undo栈
 
                 //更新画布
                 canvasVi.updateSavedBitmap();
@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                 (CanvasView.pelList).add(newPel);
 
                 //记录栈中信息
-                undoStack.push(new DrawpelStep(newPel));//将该“步”压入undo栈
+                undoStack.push(new DrawPelStep(newPel));//将该“步”压入undo栈
 
                 //更新画布
                 canvasVi.updateSavedBitmap();
@@ -487,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
                 (pel.region).setPath(pel.path, CanvasView.getClipRegion());
             }
             (pelList).add(pel);
-            undoStack.push(new CopypelStep(pel));//将该“步”压入undo栈
+            undoStack.push(new CopyPelStep(pel));//将该“步”压入undo栈
             //清空选中
             CanvasView.setSelectedPel(selectedPel = null);
             if (CanvasView.touch instanceof TransformTouch) {
@@ -517,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
                     (selectedPel.paint).setStyle(Paint.Style.STROKE);//填充边框
 
                 Paint newPaint = new Paint(selectedPel.paint);////设置新画笔（undo用）
-                undoStack.push(new FillpelStep(selectedPel, oldPaint, newPaint));//将该“步”压入undo栈
+                undoStack.push(new FillPelStep(selectedPel, oldPaint, newPaint));//将该“步”压入undo栈
 
                 CanvasView.setSelectedPel(selectedPel = null);
                 canvasVi.updateSavedBitmap();//填充了图元就自然更新缓冲画布
@@ -536,7 +536,7 @@ public class MainActivity extends AppCompatActivity {
         selectedPel = CanvasView.getSelectedPel();
         if (selectedPel != null)//选中了图元才能进行删除操作
         {
-            undoStack.push(new DeletepelStep(selectedPel));//将该“步”压入undo栈
+            undoStack.push(new DeletePelStep(selectedPel));//将该“步”压入undo栈
             (pelList).remove(selectedPel);
 
             CanvasView.setSelectedPel(selectedPel = null);
@@ -833,7 +833,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             String currentDate = TimeUtils.getCurrentDate(TimeUtils.dateFormatYMDHMS);
             savedImagePath = Constant.savePath + "/" + currentDate + ".jpg";
-            savedImageDataPath = Constant.savePath + "/" + currentDate + ".txt";
+            savedImageDataPath = Constant.savePath + "/" + currentDate + ".and";
             File file = new File(savedImagePath);
             if (!file.exists()) //文件不存在
             {
@@ -967,7 +967,7 @@ public class MainActivity extends AppCompatActivity {
 
         //更新数据
         pelList.add(recognizedPel);//加入链表
-        undoStack.push(new DrawpelStep(recognizedPel));//将该“步”压入undo栈
+        undoStack.push(new DrawPelStep(recognizedPel));//将该“步”压入undo栈
 
         //更新画布
         CanvasView.setSelectedPel(selectedPel = null);//刚才画的图元失去焦点

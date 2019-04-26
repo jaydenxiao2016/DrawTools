@@ -7,7 +7,7 @@ import com.jayden.drawtool.ui.view.CanvasView;
 
 
 //变换图元步骤
-public class TransformpelStep extends Step {
+public class TransformPelStep extends Step {
     private static Region clipRegion = CanvasView.getClipRegion();
     private Pel savedPel;
     /**
@@ -15,7 +15,7 @@ public class TransformpelStep extends Step {
      */
     private Pel toUndoPel;
 
-    public TransformpelStep(Pel pel) //构造
+    public TransformPelStep(Pel pel) //构造
     {
         super(pel);//重写父类
         savedPel = curPel.clone();
