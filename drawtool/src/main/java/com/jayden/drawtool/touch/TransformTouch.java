@@ -144,18 +144,19 @@ public class TransformTouch extends Touch {
             if (mode == TRANSLATE)// 平移操作
             {
                 // 对选中图元施行平移变换
+                selectedPel.transDx = oridx + (curPoint.x - downPoint.x);
+                selectedPel.transDy = oridy + (curPoint.y - downPoint.y);
+                //重新设置矩阵中心点
+                centerPoint.set(calPelCenterPoint(selectedPel));
                 cachedMatrix.setTranslate(originalRect.left + oridx + (curPoint.x - downPoint.x), originalRect.top + oridy + (curPoint.y - downPoint.y)); // 作用于平移变换因子
                 cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
                 cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
                 //重新确定四个点
                 matrixCheck();
-                selectedPel.transDx = oridx + (curPoint.x - downPoint.x);
-                selectedPel.transDy = oridy + (curPoint.y - downPoint.y);
             } else if (mode == DRAG) // 缩放旋转操作
             {
                 //开始位置
                 cachedMatrix.setTranslate(originalRect.left + oridx, originalRect.top + oridy);
-
                 //累计缩放倍数
                 selectedPel.scale = getScale(centerPoint,
                         new PointF(selectedPel.bottomRightPointF.x + selectedPel.transDx,
@@ -315,6 +316,11 @@ public class TransformTouch extends Touch {
      * 重新获取拖动按钮实际所在区域
      */
     private void reSetDragBtnRect() {
+        Rect bounds = selectedPel.region.getBounds();
+//        selectedPel.dragBtnRect = new RectF(bounds.right - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
+//                bounds.bottom - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
+//                bounds.right + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
+//                bounds.bottom + (selectedPel.dragBitmap.getHeight() * 1.0f / 2));
         selectedPel.dragBtnRect = new RectF(selectedPel.rightBottomPoint.x - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
                 selectedPel.rightBottomPoint.y - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
                 selectedPel.rightBottomPoint.x + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
