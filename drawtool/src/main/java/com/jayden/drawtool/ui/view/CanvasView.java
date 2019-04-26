@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,13 +21,26 @@ import android.view.WindowManager;
 
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
+import com.jayden.drawtool.bean.Picture;
+import com.jayden.drawtool.bean.Text;
 import com.jayden.drawtool.step.Step;
+import com.jayden.drawtool.touch.DrawBesselTouch;
+import com.jayden.drawtool.touch.DrawBrokenlineTouch;
 import com.jayden.drawtool.touch.DrawFreehandTouch;
+import com.jayden.drawtool.touch.DrawLineTouch;
+import com.jayden.drawtool.touch.DrawOvalTouch;
+import com.jayden.drawtool.touch.DrawPolygonTouch;
+import com.jayden.drawtool.touch.DrawRectTouch;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.touch.Touch;
 import com.jayden.drawtool.touch.TransformTouch;
 import com.jayden.drawtool.ui.activity.MainActivity;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -49,7 +63,7 @@ public class CanvasView extends View {
      */
     public static Paint animPelPaint;
     /**
-     *  画画用的画笔
+     * 画画用的画笔
      */
     public static Paint drawPelPaint;
     /**
@@ -425,5 +439,193 @@ public class CanvasView extends View {
 
     public Paint getDrawTextPaint() {
         return drawTextPaint;
+    }
+
+    /**
+     * 保存txt数据文件（读和取位置要一一对应）
+     *
+     * @param path
+     */
+    public synchronized void saveFileData(String path) throws Exception {
+        if (!TextUtils.isEmpty(path)) {
+            DataOutputStream out = new DataOutputStream(new FileOutputStream(path));
+            //1.保存背景
+            //2.保存各图元数据
+            ListIterator<Pel> pelIterator = pelList.listIterator();// 获取pelList对应的迭代器头结点
+            //图元总数
+            out.writeInt(pelList.size());
+            while (pelIterator.hasNext()) {
+                Pel pel = pelIterator.next();
+                //类型
+                out.writeInt(pel.type);
+                /**
+                 * 类型
+                 * path类型：10:自由线 11：矩型 12：塞尔曲线 13：圆 14：直线 15：多重折线 16：多边形
+                 * 文本类型：20
+                 * 照片类型：30
+                 */
+                switch (pel.type) {
+                    //path类型
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                        //点总数
+                        out.writeInt(pel.pathPointFList != null ? pel.pathPointFList.size() : 0);
+                        //点坐标
+                        if (pel.pathPointFList != null) {
+                            for (PointF pointF : pel.pathPointFList) {
+                                out.writeFloat(pointF.x);
+                                out.writeFloat(pointF.y);
+                            }
+                        }
+                        break;
+                    //文本
+                    case 20:
+                        if (pel.text != null) {
+                            out.writeUTF(pel.text.getContent());
+                            out.writeInt(pel.text.getPaint().getColor());
+                        }
+                        break;
+                    //照片
+                    case 30:
+                        if (pel.picture != null) {
+                            out.writeInt(pel.picture.getContentId());
+                        }
+                        break;
+                }
+                //矩阵
+                Rect rect = pel.region.getBounds();
+                out.writeInt(rect.left);
+                out.writeInt(rect.top);
+                out.writeInt(rect.right);
+                out.writeInt(rect.bottom);
+                //平移x
+                out.writeFloat(pel.transDx);
+                //平移y
+                out.writeFloat(pel.transDy);
+                //缩放倍数
+                out.writeFloat(pel.scale);
+                //中心点x
+                out.writeFloat(pel.centerPoint.x);
+                //中心点y
+                out.writeFloat(pel.centerPoint.y);
+                //开始点x
+                out.writeFloat(pel.beginPoint.x);
+                //开始点y
+                out.writeFloat(pel.beginPoint.y);
+                //区域右下角点x
+                out.writeFloat(pel.bottomRightPointF.x);
+                ///区域右下角点y
+                out.writeFloat(pel.bottomRightPointF.y);
+                //画笔颜色
+                out.writeInt(pel.paintColor);
+                ///画笔宽度
+                out.writeFloat(pel.paintStrokeWidth);
+            }
+            out.close();
+        }
+    }
+
+    /**
+     * 加载txt文件数据（读和取位置要一一对应）
+     *
+     * @param path
+     */
+    public synchronized void loadFileData(String path) throws Exception {
+        if (!TextUtils.isEmpty(path) && new File(path).exists()) {
+            CanvasView.pelList.clear();
+            DataInputStream in = new DataInputStream(new FileInputStream(path));
+            //1.获取背景
+            //2.获取各图元数据
+            int pelSize = in.readInt();
+            for (int i = 0; i < pelSize; i++) {
+                //类型
+                int type = in.readInt();
+                Pel pel = null;
+                /**
+                 * 类型
+                 * path类型：10:自由线 11：矩型 12：塞尔曲线 13：圆 14：直线 15：多重折线 16：多边形
+                 * 文本类型：20
+                 * 照片类型：30
+                 */
+                switch (type) {
+                    //path类型
+                    //自由线
+                    case 10:
+                        pel = DrawFreehandTouch.loadPel(in);
+                        break;
+                    //矩型
+                    case 11:
+                        pel = DrawRectTouch.loadPel(in);
+                        break;
+                    //塞尔曲线
+                    case 12:
+                        pel = DrawBesselTouch.loadPel(in);
+                        break;
+                    //圆
+                    case 13:
+                        pel = DrawOvalTouch.loadPel(in);
+                        break;
+                    //直线
+                    case 14:
+                        pel = DrawLineTouch.loadPel(in);
+                        break;
+                    //多重折线
+                    case 15:
+                        pel = DrawBrokenlineTouch.loadPel(in);
+                        break;
+                    //多边形
+                    case 16:
+                        pel = DrawPolygonTouch.loadPel(in);
+                        break;
+                    //文本
+                    case 20:
+                        Text text = new Text(in.readUTF());
+                        pel = new Pel();
+                        pel.type = 20;
+                        pel.text = text;
+                        break;
+                    //照片
+                    case 30:
+                        Picture picture = new Picture(in.readInt());
+                        pel = new Pel();
+                        pel.type = 30;
+                        pel.picture = picture;
+                        break;
+                }
+                if (pel != null) {
+                    //矩阵
+                    pel.region.set(in.readInt(), in.readInt(), in.readInt(), in.readInt());
+                    //平移x
+                    pel.transDx = in.readFloat();
+                    //平移y
+                    pel.transDy = in.readFloat();
+                    //缩放倍数
+                    pel.scale = in.readFloat();
+                    //中心点
+                    pel.centerPoint = new PointF(in.readFloat(), in.readFloat());
+                    //开始点x
+                    pel.beginPoint = new PointF(in.readFloat(), in.readFloat());
+                    //区域右下角点x
+                    pel.bottomRightPointF = new PointF(in.readFloat(), in.readFloat());
+                    //画笔颜色
+                    int color = in.readInt();
+                    pel.paint.setColor(color);
+                    pel.paintColor=color;
+                    ///画笔宽度
+                    float width = in.readFloat();
+                    pel.paint.setStrokeWidth(width);
+                    pel.paintStrokeWidth=width;
+                }
+                CanvasView.pelList.add(pel);
+            }
+            in.close();
+            //更新
+            updateSavedBitmap();
+        }
     }
 }

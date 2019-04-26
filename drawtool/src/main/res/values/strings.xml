@@ -40,6 +40,7 @@
     <string name="tools_toptitle_txt_pen">笔触</string>
     <string name="tools_toptitle_txt_clear">清空</string>
     <string name="tools_toptitle_txt_save">保存</string>
+    <string name="tools_toptitle_txt_photo_list">画廊</string>
     <string name="tools_bottomtitle_txt_openpelbar">绘图</string>
     <string name="tools_bottomtitle_txt_opentransbar">编辑</string>
     <string name="tools_bottomtitle_txt_opencrossfill">填充</string>

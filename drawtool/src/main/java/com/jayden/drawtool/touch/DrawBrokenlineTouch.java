@@ -4,8 +4,12 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.view.CanvasView;
+
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 画折线
@@ -28,10 +32,11 @@ public class DrawBrokenlineTouch extends DrawTouch {
             beginPoint.set(downPoint);
 
             newPel = new Pel();
-            newPel.type=15;
+            newPel.type = 15;
             (newPel.path).moveTo(beginPoint.x, beginPoint.y);
             lastPath.set(newPel.path);
-
+            //路径组成的点
+            newPel.pathPointFList.add(new PointF(beginPoint.x, beginPoint.y));
             firstDown = false;
         }
     }
@@ -44,7 +49,6 @@ public class DrawBrokenlineTouch extends DrawTouch {
 
         (newPel.path).set(lastPath);
         (newPel.path).lineTo(movePoint.x, movePoint.y);
-
         CanvasView.setSelectedPel(selectedPel = newPel);
     }
 
@@ -58,14 +62,16 @@ public class DrawBrokenlineTouch extends DrawTouch {
 
             if (hasFinished == true) {
                 newPel.closure = false;
-                //路径组成的点
-                newPel.pathPointFList.add(beginPoint);
-                newPel.pathPointFList.add(movePoint);
                 super.up();
                 hasFinished = false;
                 firstDown = true;
             } else {
-                lastPath.set(newPel.path);
+                // //手指移动才生效
+                if(downPoint.x!=curPoint.x||downPoint.y!=curPoint.y) {
+                //路径组成的点
+                    newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
+                    lastPath.set(newPel.path);
+                }
             }
         }
     }
@@ -87,5 +93,33 @@ public class DrawBrokenlineTouch extends DrawTouch {
         float x = begin.x - end.x;
         float y = begin.y - end.y;
         return (float) Math.sqrt(x * x + y * y);
+    }
+
+    /**
+     * 构造折线pel
+     *
+     * @param in
+     * @return
+     */
+    public static Pel loadPel(DataInputStream in) throws Exception {
+        //点总数
+        int pointSize = in.readInt();
+        List<PointF> pathPointFList = new ArrayList<>();
+        //点坐标
+        for (int i = 0; i < pointSize; i++) {
+            Float x = in.readFloat();
+            Float y = in.readFloat();
+            pathPointFList.add(new PointF(x, y));
+        }
+        Pel pel = new Pel();
+        pel.type = 15;
+        if (pathPointFList != null && pathPointFList.size() > 1) {
+            pel.pathPointFList = pathPointFList;
+            (pel.path).moveTo(pathPointFList.get(0).x, pathPointFList.get(0).y);
+            for (int i = 1; i < pathPointFList.size(); i++) {
+                (pel.path).lineTo(pathPointFList.get(i).x, pathPointFList.get(i).y);
+            }
+        }
+        return pel;
     }
 }

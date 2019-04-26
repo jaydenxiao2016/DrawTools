@@ -6,8 +6,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Region;
-import android.util.Log;
 
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
@@ -22,21 +20,17 @@ import java.util.ListIterator;
 public class TransformTouch extends Touch {
 
     private Matrix cachedMatrix; //选中图元的最初因子
-    private Matrix transMatrix; //变换因子（平移、缩放、旋转）
     private PointF downPoint; //按下，移动，两指中点
     public PointF centerPoint; //缩放、旋转中心
     private Pel savedPel; //重绘图元
     private RectF originalRect;//开始矩阵
-    private RectF contentRect;//变换中矩阵
     private int originalRegionWidth;//开始矩阵宽
     private int originalRegionHeight;//开始矩阵高
     private static final int NONE = 0; // 平移操作
     private static final int DRAG = 1; //缩放、旋转 操作
     private static final int TRANSLATE = 2; // 平移操作
     private static int mode = NONE; // 当前操作类型
-    private float dx, dy, oridx, oridy; //平移偏移量
-    private float scale, oriScale; //缩放倍数
-    private float degree;//旋转量
+    private float dx, dy, oridx, oridy; //最初平移偏移量
     private static final float MIN_ZOOM = 0.3f; //缩放下限
 
     private Step step = null;
@@ -47,12 +41,9 @@ public class TransformTouch extends Touch {
         this.context = context;
         downPoint = new PointF();
         cachedMatrix = new Matrix();
-        transMatrix = new Matrix();
         centerPoint = new PointF();
         savedPel = new Pel();
-        dx = dy = oridx = oridy = 0;
-        scale = 1;
-        degree = 0;
+        oridx = oridy = 0;
         originalRegionWidth = 0;
         originalRegionHeight = 0;
     }
@@ -72,8 +63,15 @@ public class TransformTouch extends Touch {
             ListIterator<Pel> pelIterator = pelList.listIterator(); // 获取pelList对应的迭代器头结点
             while (pelIterator.hasNext()) {
                 Pel pel = pelIterator.next();
-                Rect rect = (pel.region).getBounds();
-
+                Rect bounds = (pel.region).getBounds();
+                RectF rect = new RectF();
+                RectF oldRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
+                Matrix cachedMatrix = new Matrix();
+                //开始位置
+                cachedMatrix.setTranslate(pel.transDx, pel.transDy);
+                cachedMatrix.postScale(pel.scale, pel.scale, pel.centerPoint.x, pel.centerPoint.y);
+                cachedMatrix.postRotate(pel.degree, pel.centerPoint.x, pel.centerPoint.y);
+                reSetDstRect(cachedMatrix, rect, oldRect);
                 float leftDis = Math.abs(rect.left - downPoint.x);
                 float rightDis = Math.abs(rect.right - downPoint.x);
                 float horizontalDis = leftDis + rightDis;
@@ -145,34 +143,18 @@ public class TransformTouch extends Touch {
         {
             if (mode == TRANSLATE)// 平移操作
             {
-                dx = oridx + (curPoint.x - downPoint.x);//计算距离
-                dy = oridy + (curPoint.y - downPoint.y);
-
                 // 对选中图元施行平移变换
-                cachedMatrix.setTranslate(originalRect.left + (curPoint.x - downPoint.x), originalRect.top + (curPoint.y - downPoint.y)); // 作用于平移变换因子
-                transMatrix.setTranslate(curPoint.x - downPoint.x, curPoint.y - downPoint.y);
-                //累计偏移量
-                selectedPel.transDx = dx;
-                selectedPel.transDy = dy;
-
-                reSetDstRect(transMatrix, contentRect, originalRect);
-                selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
-                //重新检查
+                cachedMatrix.setTranslate(originalRect.left + oridx + (curPoint.x - downPoint.x), originalRect.top + oridy + (curPoint.y - downPoint.y)); // 作用于平移变换因子
+                cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
+                cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
+                //重新确定四个点
                 matrixCheck();
+                selectedPel.transDx = oridx + (curPoint.x - downPoint.x);
+                selectedPel.transDy = oridy + (curPoint.y - downPoint.y);
             } else if (mode == DRAG) // 缩放旋转操作
             {
-                cachedMatrix = new Matrix();
                 //开始位置
-                cachedMatrix.setTranslate(originalRect.left, originalRect.top);
-                transMatrix = new Matrix();
-                //当前缩放倍数
-                scale = getScale(centerPoint, downPoint, curPoint);
-                cachedMatrix.postScale(scale, scale, centerPoint.x, centerPoint.y);// 縮放
-                transMatrix.postScale(scale, scale, centerPoint.x, centerPoint.y);// 縮放
-                //当前旋转角度
-                degree = getAngle(centerPoint, downPoint, curPoint);
-                cachedMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
-                transMatrix.postRotate(degree, centerPoint.x, centerPoint.y);// 旋轉
+                cachedMatrix.setTranslate(originalRect.left + oridx, originalRect.top + oridy);
 
                 //累计缩放倍数
                 selectedPel.scale = getScale(centerPoint,
@@ -184,11 +166,9 @@ public class TransformTouch extends Touch {
                         new PointF(selectedPel.bottomRightPointF.x + selectedPel.transDx,
                                 selectedPel.bottomRightPointF.y + selectedPel.transDy),
                         curPoint);
-
-                Log.e("jaydenxiao", selectedPel.degree + "" );
-                reSetDstRect(transMatrix, contentRect, originalRect);
-                selectedPel.region.set(new Region((int) contentRect.left, (int) contentRect.top, (int) contentRect.right, (int) contentRect.bottom));
-
+                cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
+                cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
+                //重新确定四个点
                 matrixCheck();
             }
         }
@@ -204,10 +184,8 @@ public class TransformTouch extends Touch {
         {
             //敲定当前对应步骤
             if (selectedPel != null) {
-                oridx = dx;
-                oridy = dy;
-                Log.e("jaydenxiao", "oriScale:" + oriScale + "" );
-                step.setToUndoMatrix(transMatrix);//设置进行该次步骤后的变换因子
+                oridx = selectedPel.transDx;
+                oridy = selectedPel.transDy;
                 step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
                 undoStack.push(step);//将该“步”压入undo栈
                 // 敲定此次操作的最终区域
@@ -220,12 +198,12 @@ public class TransformTouch extends Touch {
     }
 
     private void initSelect() {
+
         //敲定开始矩阵宽高
         Rect bounds = selectedPel.region.getBounds();
         originalRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
         originalRegionWidth = (int) (originalRect.right - originalRect.left);
         originalRegionHeight = (int) (originalRect.bottom - originalRect.top);
-        contentRect = new RectF();
         //拖动图标
         selectedPel.dragBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_control);
         selectedPel.leftBottomPoint = new PointF();
@@ -236,17 +214,16 @@ public class TransformTouch extends Touch {
         //初始化原有偏移，偏移是累计的
         oridx = selectedPel.transDx;
         oridy = selectedPel.transDy;
-        oriScale = selectedPel.scale;
-
+        //初始化变换矩阵中心点
+        centerPoint.set(calPelCenterPoint(selectedPel));
         // 获取选中图元的初始matrix
         cachedMatrix = new Matrix();
         //开始位置
-        cachedMatrix.setTranslate(originalRect.left, originalRect.top);
-        transMatrix = new Matrix();
-        //矩阵参数检查
+        cachedMatrix.setTranslate(originalRect.left + oridx, originalRect.top + oridy);
+        cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
+        cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
+        //矩阵参数检查,设置4个点坐标
         matrixCheck();
-        //初始化变换矩阵中心点
-        centerPoint.set(calPelCenterPoint(selectedPel));
         //由已知信息构造该步骤
         step = new TransformpelStep(selectedPel);//设置该步骤对应图元
     }
@@ -386,6 +363,6 @@ public class TransformTouch extends Touch {
         Rect boundRect = new Rect();
         selectedPel.region.getBounds(boundRect);
 
-        return new PointF((boundRect.right + boundRect.left) / 2, (boundRect.bottom + boundRect.top) / 2);
+        return new PointF((boundRect.right + boundRect.left) / 2 + selectedPel.transDx, (boundRect.bottom + boundRect.top) / 2 + selectedPel.transDy);
     }
 }

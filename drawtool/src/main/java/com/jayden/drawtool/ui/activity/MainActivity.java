@@ -1,6 +1,5 @@
 package com.jayden.drawtool.ui.activity;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +20,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.jayden.drawtool.Constant;
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.bean.Picture;
@@ -74,10 +75,10 @@ import java.util.Stack;
  */
 public class MainActivity extends AppCompatActivity {
     /*************************************************/
-    private String softDir = "/DrawTools";
     public static Context context;
     public static int SCREEN_WIDTH, SCREEN_HEIGHT;
     private String savedImagePath;
+    private String savedImageDataPath;
 
     //内部算法
     private List<Pel> pelList;
@@ -86,10 +87,6 @@ public class MainActivity extends AppCompatActivity {
     private static Stack<Step> redoStack;
     private static CanvasView canvasVi;
 
-    /*************************************************/
-    //退出系统用
-    private AlertDialog.Builder dialog;
-    private boolean hasExitAppDialog = false;
     /*************************************************/
 
     //控件;
@@ -122,12 +119,24 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PICTURE = 2; //缩放
     private static final String IMAGE_UNSPECIFIED = "image/*";
     /**************************************************************************************/
-    //进度对话框必要组件
-    private ProgressDialog progressDialog;
+
+    private String imageDataPath;
+
+    /**
+     * 入口
+     *
+     * @param context
+     */
+    public static void startAction(Context context, String imageDataPath) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra("imageDataPath", imageDataPath);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        imageDataPath = getIntent().getStringExtra("imageDataPath");
         initView();
         initData();
     }
@@ -176,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     //初始化数据
     public void initData() {
         //事先生成图片被存储的文件夹
-        File file = new File(Environment.getExternalStorageDirectory().getPath() + softDir);
+        File file = new File(Constant.savePath);
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -250,40 +259,12 @@ public class MainActivity extends AppCompatActivity {
     public void onOpenPelbarBtn(View v) {
         ensureCanvasbgbarClosed();
         updateToolbarIcons(v);//更新工具条图标显示
-
         if (pelbarPopwin.isShowing())//如果悬浮栏打开
             pelbarPopwin.dismiss();//关闭
         else
             pelbarPopwin.showAtLocation(downToolbarSclVi, Gravity.BOTTOM, 0, downToolbarSclVi.getHeight());//打开悬浮窗
-
         //按下也要注册当前选中图元的touch
         CanvasView.setTouch(new DrawFreehandTouch());
-//        int i = curPelVi.getId();
-//        if (i == R.id.btn_rect) {
-//            CanvasView.setTouch(new DrawRectTouch());
-//
-//        } else if (i == R.id.btn_bessel) {
-//            CanvasView.setTouch(new DrawBesselTouch());
-//
-//        } else if (i == R.id.btn_oval) {
-//            CanvasView.setTouch(new DrawOvalTouch());
-//
-//        } else if (i == R.id.btn_polygon) {
-//            CanvasView.setTouch(new DrawPolygonTouch());
-//
-//        } else if (i == R.id.btn_brokenline) {
-//            CanvasView.setTouch(new DrawBrokenlineTouch());
-//
-//        } else if (i == R.id.btn_line) {
-//            CanvasView.setTouch(new DrawLineTouch());
-//
-//        } else if (i == R.id.btn_freehand) {
-//            CanvasView.setTouch(new DrawFreehandTouch());
-//
-//        } else if (i == R.id.btn_keepdrawing) {
-//            CanvasView.setTouch(new KeepDrawingTouch());
-//
-//        }
     }
 
     //打开工具箱
@@ -364,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 newPel.region = region;
                 newPel.beginPoint = beginPoint;
                 newPel.centerPoint = centerPoint;
-                newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
+                newPel.bottomRightPointF.set(newPel.region.getBounds().right, newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
                 (CanvasView.pelList).add(newPel);
@@ -405,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
                         contentId);
                 centerPoint.set(beginPoint.x + content.getWidth() / 2, beginPoint.y + content.getHeight() / 2);
                 Picture picture = new Picture(contentId);
-                //文本区域
+                //区域
                 Region region = new Region();
                 region.set((int) beginPoint.x, (int) beginPoint.y, (int) (beginPoint.x + content.getWidth()), (int) (beginPoint.y) + content.getHeight());
 
@@ -415,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
                 newPel.region = region;
                 newPel.beginPoint = new PointF(beginPoint.x, beginPoint.y);
                 newPel.centerPoint = new PointF(centerPoint.x, centerPoint.y);
-                newPel.bottomRightPointF.set(newPel.region.getBounds().right,newPel.region.getBounds().bottom);
+                newPel.bottomRightPointF.set(newPel.region.getBounds().right, newPel.region.getBounds().bottom);
 
                 //添加至文本总链表
                 (CanvasView.pelList).add(newPel);
@@ -850,7 +831,9 @@ public class MainActivity extends AppCompatActivity {
     //保存
     public void onSaveBtn(final View v) {
         try {
-            savedImagePath = Environment.getExternalStorageDirectory().getPath() + softDir + "/" + TimeUtils.getCurrentDate(TimeUtils.dateFormatYMDHMS) + ".jpg";
+            String currentDate = TimeUtils.getCurrentDate(TimeUtils.dateFormatYMDHMS);
+            savedImagePath = Constant.savePath + "/" + currentDate + ".jpg";
+            savedImageDataPath = Constant.savePath + "/" + currentDate + ".txt";
             File file = new File(savedImagePath);
             if (!file.exists()) //文件不存在
             {
@@ -860,7 +843,7 @@ public class MainActivity extends AppCompatActivity {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
                 fileOutputStream.close();
                 //保存and数据文件
-
+                canvasVi.saveFileData(savedImageDataPath);
                 Toast.makeText(MainActivity.this, "图片已保存在(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
             } else //文件存在
             {
@@ -896,6 +879,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    //画廊
+    public void onPhotoList(View view) {
+        GalleryActivity.startActionForResult(this,110);
     }
 
     //换背景
@@ -952,11 +940,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //打开图库、拍照完毕后需要执行抉择的动作
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-
-    }
     /*************************************************************************************/
 /**
  * 辅助方法
@@ -1020,6 +1003,38 @@ public class MainActivity extends AppCompatActivity {
     public static void setToolsClickable(boolean bool) {
         for (int i = 0; i < allBtns.length; i++)
             allBtns[i].setClickable(bool);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK&&data!=null) {
+            imageDataPath = data.getStringExtra("imageDataPath");
+            clearData();
+            try {
+                canvasVi.loadFileData(imageDataPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private long exitTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                android.os.Process.killProcess(android.os.Process.myPid());
+                MainActivity.this.onDestroy();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
 

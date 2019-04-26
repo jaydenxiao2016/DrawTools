@@ -7,6 +7,10 @@ import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.ui.activity.MainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 画贝塞尔曲线
  */
@@ -54,7 +58,6 @@ public class DrawBesselTouch extends DrawTouch {
     @Override
     public void up() {
         ifNeedToOpenTools();
-
         PointF upPoint = new PointF();
         upPoint.set(curPoint);
 
@@ -65,12 +68,13 @@ public class DrawBesselTouch extends DrawTouch {
         } else {
             newPel.closure = false;
             //路径组成的点
-            newPel.pathPointFList.add(beginPoint);
-            newPel.pathPointFList.add(movePoint);
-            newPel.pathPointFList.add(endPoint);
+            newPel.pathPointFList.add(new PointF(beginPoint.x,beginPoint.y));
+            newPel.pathPointFList.add(new PointF(movePoint.x,movePoint.y));
+            newPel.pathPointFList.add(new PointF(endPoint.x,endPoint.y));
             super.up(); //最终敲定
             control = false;
         }
+        movePoint.set(beginPoint);
     }
 
     public void ifNeedToOpenTools() {
@@ -81,5 +85,32 @@ public class DrawBesselTouch extends DrawTouch {
             control = true;
             return;
         }
+    }
+
+    /**
+     * 构造贝塞尔曲线pel
+     * @param in
+     * @return
+     */
+    public static Pel loadPel(DataInputStream in) throws Exception{
+        //点总数
+        int pointSize = in.readInt();
+        List<PointF> pathPointFList=new ArrayList<>();
+        //点坐标
+        for (int i = 0; i < pointSize; i++) {
+            Float x = in.readFloat();
+            Float y = in.readFloat();
+            pathPointFList.add(new PointF(x, y));
+        }
+        Pel pel = new Pel();
+        pel.type = 12;
+        if (pathPointFList != null && pathPointFList.size() == 3) {
+            pel.pathPointFList = pathPointFList;
+            (pel.path).moveTo(pathPointFList.get(0).x, pathPointFList.get(0).y);
+            (pel.path).cubicTo(pathPointFList.get(0).x, pathPointFList.get(0).y,
+                    pathPointFList.get(1).x, pathPointFList.get(1).y,
+                    pathPointFList.get(2).x, pathPointFList.get(2).y);
+        }
+        return pel;
     }
 }

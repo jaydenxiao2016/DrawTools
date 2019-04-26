@@ -1,6 +1,7 @@
 package com.jayden.drawtool.bean;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -58,11 +59,19 @@ public class Pel extends BasePel {
 
     //构造（实际使用时应该把Pel构造成Pel(path region paint name)的形式，形参均在外部都已经定义好了的）
     public Pel() {
-        pathPointFList=new ArrayList<>();
+        pathPointFList = new ArrayList<>();
         path = new Path();
         region = new Region();
-        paint = new Paint();
+        paint = new Paint(Paint.DITHER_FLAG);
+        paint.setColor(Color.parseColor("#ff298ecb"));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(5);
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setStrokeJoin(Paint.Join.ROUND);
         centerPoint = new PointF();
+        beginPoint = new PointF();
         bottomRightPointF = new PointF();
         text = null;
         picture = null;
@@ -127,5 +136,4 @@ public class Pel extends BasePel {
         }
 
     }
-
 }

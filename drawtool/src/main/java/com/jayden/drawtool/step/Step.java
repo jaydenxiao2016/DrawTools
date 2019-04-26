@@ -1,12 +1,8 @@
 package com.jayden.drawtool.step;
 
-import android.graphics.Matrix;
-
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.ui.activity.MainActivity;
-
-import java.util.List;
+import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
  * 类名：Step.java
@@ -16,7 +12,6 @@ import java.util.List;
  * 最后修改时间：2019/4/10
  */
 public class Step {
-    protected static List<Pel> pelList = CanvasView.getPelList(); // 图元链表
     protected static CanvasView canvasVi = MainActivity.getCanvasView(); //通知重绘用
     protected Pel curPel;//最早放入undo的图元
 
@@ -33,8 +28,6 @@ public class Step {
     {
     }
 
-    public void setToUndoMatrix(Matrix matrix) {
-    }
     public void setToUndoPel(Pel pel) {
     }
 }

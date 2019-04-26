@@ -185,6 +185,12 @@
             android:drawableTop="@drawable/btn_save_normal"
             android:onClick="onSaveBtn"
             android:text="@string/tools_toptitle_txt_save"/>
+        <Button
+            android:id="@+id/btn_photo_list"
+            style="@style/DrawToolButton"
+            android:drawableTop="@drawable/btn_photo_list"
+            android:onClick="onPhotoList"
+            android:text="@string/tools_toptitle_txt_photo_list"/>
     </LinearLayout>
 
     <LinearLayout
