@@ -30,6 +30,7 @@ public class DrawTouch extends Touch {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(Constant.PAINT_DEFAULT_STROKE_WIDTH);
+        paint.setTextSize(Constant.PAINT_DEFAULT_TEXT_SIZE);
         paint.setAntiAlias(true);
         paint.setDither(true);
         paint.setStrokeJoin(Paint.Join.ROUND);

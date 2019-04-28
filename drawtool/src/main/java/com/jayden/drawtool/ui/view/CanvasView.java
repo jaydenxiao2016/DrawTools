@@ -160,6 +160,7 @@ public class CanvasView extends View {
         drawTextPaint = new Paint();
         drawTextPaint.setColor(DrawTouch.getCurPaint().getColor());
         drawTextPaint.setTextSize(Constant.PAINT_DEFAULT_TEXT_SIZE);
+        drawTextPaint.setStrokeWidth(Constant.PAINT_DEFAULT_STROKE_WIDTH);
         drawTextPaint.setAntiAlias(true);
         drawTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         drawPicturePaint = new Paint();

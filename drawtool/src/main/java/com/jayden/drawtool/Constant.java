@@ -29,9 +29,9 @@ public class Constant {
     /**
      * 默认画笔粗细大小
      */
-    public static final int PAINT_DEFAULT_STROKE_WIDTH= 5;
+    public static final int PAINT_DEFAULT_STROKE_WIDTH= 6;
     /**
      * 默认画笔textsize大小
      */
-    public static final int PAINT_DEFAULT_TEXT_SIZE = 30;
+    public static final int PAINT_DEFAULT_TEXT_SIZE = 50;
 }
