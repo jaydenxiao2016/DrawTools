@@ -4,7 +4,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.DataInputStream;
@@ -74,10 +74,12 @@ public class DrawPolygonTouch extends DrawTouch {
                 firstDown = true;
             }
             // //手指移动才生效
-            if(downPoint.x!=curPoint.x||downPoint.y!=curPoint.y) {
+            if (downPoint.x != curPoint.x || downPoint.y != curPoint.y) {
                 //路径组成的点
-                newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
-                lastPath.set(newPel.path);
+                if (newPel != null) {
+                    newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
+                    lastPath.set(newPel.path);
+                }
             }
         }
     }
@@ -85,7 +87,7 @@ public class DrawPolygonTouch extends DrawTouch {
     public boolean isNeedToOpenTools() {
         if (dis < 10f) {
             dis = 0;
-            MainActivity.openTools();
+            DrawMainActivity.openTools();
 
             return true;
         } else {
@@ -99,6 +101,7 @@ public class DrawPolygonTouch extends DrawTouch {
         float y = begin.y - end.y;
         return (float) Math.sqrt(x * x + y * y);
     }
+
     /**
      * 构造折线pel
      *

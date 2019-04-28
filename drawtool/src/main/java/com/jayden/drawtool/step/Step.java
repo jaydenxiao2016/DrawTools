@@ -1,7 +1,7 @@
 package com.jayden.drawtool.step;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 /**
@@ -12,22 +12,38 @@ import com.jayden.drawtool.ui.view.CanvasView;
  * 最后修改时间：2019/4/10
  */
 public class Step {
-    protected static CanvasView canvasVi = MainActivity.getCanvasView(); //通知重绘用
-    protected Pel curPel;//最早放入undo的图元
+    /**
+     * 通知重绘用
+     */
+    protected static CanvasView canvasVi = DrawMainActivity.getCanvasView();
+    /**
+     * 最早放入undo的图元
+     */
+    protected Pel curPel;
 
-    public Step(Pel pel) //构造
+    public Step(Pel pel)
     {
         this.curPel = pel;
     }
 
-    public void toUndoUpdate() //进undo栈时对List中图元的更新（子类覆写）
+    /**
+     * 进undo栈时对List中图元的更新（子类覆写）
+     */
+    public void toUndoUpdate()
     {
     }
 
-    public void toRedoUpdate()//进redo栈时对List中图元的反悔（子类覆写）
+    /**
+     * 进redo栈时对List中图元的反悔（子类覆写）
+     */
+    public void toRedoUpdate()
     {
     }
 
+    /**
+     * 进undo栈时对List中图元的更新（子类覆写）
+     * @param pel
+     */
     public void setToUndoPel(Pel pel) {
     }
 }

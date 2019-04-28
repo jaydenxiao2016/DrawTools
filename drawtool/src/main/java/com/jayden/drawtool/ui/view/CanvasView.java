@@ -19,13 +19,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.jayden.drawtool.Constant;
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.bean.Picture;
 import com.jayden.drawtool.bean.Text;
 import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.touch.DrawBesselTouch;
-import com.jayden.drawtool.touch.DrawBrokenlineTouch;
+import com.jayden.drawtool.touch.DrawBrokenLineTouch;
 import com.jayden.drawtool.touch.DrawFreehandTouch;
 import com.jayden.drawtool.touch.DrawLineTouch;
 import com.jayden.drawtool.touch.DrawOvalTouch;
@@ -34,7 +35,7 @@ import com.jayden.drawtool.touch.DrawRectTouch;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.touch.Touch;
 import com.jayden.drawtool.touch.TransformTouch;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -158,7 +159,7 @@ public class CanvasView extends View {
 
         drawTextPaint = new Paint();
         drawTextPaint.setColor(DrawTouch.getCurPaint().getColor());
-        drawTextPaint.setTextSize(50);
+        drawTextPaint.setTextSize(Constant.PAINT_DEFAULT_TEXT_SIZE);
         drawTextPaint.setAntiAlias(true);
         drawTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         drawPicturePaint = new Paint();
@@ -194,7 +195,6 @@ public class CanvasView extends View {
                 canvas.drawPath(path, animPelPaint);
                 //拖曳图标
                 canvas.drawBitmap(selectedPel.dragBitmap, selectedPel.dragBtnRect.left, selectedPel.dragBtnRect.top, drawPicturePaint);
-
                 invalidate();
             } else //画图状态不产生动态画笔效果
             {
@@ -224,8 +224,8 @@ public class CanvasView extends View {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:// 第一只手指按下
             {
-                if (MainActivity.topToolbarSclVi.getVisibility() == View.VISIBLE) {
-                    MainActivity.closeTools();
+                if (DrawMainActivity.topToolbarSclVi.getVisibility() == View.VISIBLE) {
+                    DrawMainActivity.closeTools();
                     touch.dis = Float.MAX_VALUE;
                 }
 
@@ -487,7 +487,7 @@ public class CanvasView extends View {
                     case 20:
                         if (pel.text != null) {
                             out.writeUTF(pel.text.getContent());
-                            out.writeInt(pel.text.getPaint().getColor());
+                            out.writeBoolean(pel.text.isVertical());
                         }
                         break;
                     //照片
@@ -576,7 +576,7 @@ public class CanvasView extends View {
                         break;
                     //多重折线
                     case 15:
-                        pel = DrawBrokenlineTouch.loadPel(in);
+                        pel = DrawBrokenLineTouch.loadPel(in);
                         break;
                     //多边形
                     case 16:
@@ -584,7 +584,7 @@ public class CanvasView extends View {
                         break;
                     //文本
                     case 20:
-                        Text text = new Text(in.readUTF());
+                        Text text = new Text(in.readUTF(),in.readBoolean());
                         pel = new Pel();
                         pel.type = 20;
                         pel.text = text;

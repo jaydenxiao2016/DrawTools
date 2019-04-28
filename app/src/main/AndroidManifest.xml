@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/FullScreenAppTheme">
         <activity
-            android:name="com.jayden.drawtool.ui.activity.MainActivity">
+            android:name="com.jayden.drawtool.ui.activity.DrawMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

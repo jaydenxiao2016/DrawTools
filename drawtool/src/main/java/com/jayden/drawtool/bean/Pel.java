@@ -7,6 +7,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 
+import com.jayden.drawtool.Constant;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.ArrayList;
@@ -63,10 +64,10 @@ public class Pel extends BasePel {
         path = new Path();
         region = new Region();
         paint = new Paint(Paint.DITHER_FLAG);
-        paint.setColor(Color.parseColor("#ff298ecb"));
+        paint.setColor(Color.parseColor(Constant.PAINT_DEFAULT_COLOR));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(Constant.PAINT_DEFAULT_STROKE_WIDTH);
         paint.setAntiAlias(true);
         paint.setDither(true);
         paint.setStrokeJoin(Paint.Join.ROUND);
@@ -84,12 +85,14 @@ public class Pel extends BasePel {
         (pel.region).set(new Region(region));
         (pel.paint).set(new Paint(paint));
         if (text != null) {
-            pel.text = new Text(text.getContent());
+            pel.text = new Text(text.getContent(), text.isVertical());
         }
         if (picture != null) {
             pel.picture = new Picture(picture.getContentId());
             pel.picture.createContent();
         }
+        pel.type = type;
+        pel.pathPointFList = pathPointFList;
         pel.bottomRightPointF = bottomRightPointF;
         pel.centerPoint = centerPoint;
         pel.beginPoint = beginPoint;
@@ -97,6 +100,8 @@ public class Pel extends BasePel {
         pel.transDy = transDy;
         pel.scale = scale;
         pel.degree = degree;
+        pel.paintColor = paintColor;
+        pel.paintStrokeWidth = paintStrokeWidth;
         pel.closure = closure;
         return pel;
     }
@@ -113,7 +118,15 @@ public class Pel extends BasePel {
             canvas.translate(transDx, transDy);
             canvas.scale(scale, scale, centerPoint.x, centerPoint.y);
             canvas.rotate(degree, centerPoint.x, centerPoint.y);
-            canvas.drawText(text.getContent(), beginPoint.x, beginPoint.y, text.getPaint());
+            if (!text.isVertical()) {
+                canvas.drawText(text.getContent(), beginPoint.x, beginPoint.y, text.getPaint());
+            } else {
+                int heightPer = (region.getBounds().bottom - region.getBounds().top - 30) / text.getContent().length();
+                char[] chars = text.getContent().toCharArray();
+                for (int i = chars.length - 1; i >= 0; i--) {
+                    canvas.drawText(chars[i] + "", beginPoint.x, beginPoint.y - heightPer * (chars.length - 1 - i), text.getPaint());
+                }
+            }
             canvas.restore();
         }
         //图标图元

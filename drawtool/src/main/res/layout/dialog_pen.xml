@@ -3,7 +3,6 @@
               android:layout_height="wrap_content"
               android:background="@drawable/selector_bg"
               android:orientation="vertical"
-              android:layout_margin="10dp"
               android:paddingTop="10dp">
 
     <com.jayden.drawtool.ui.view.PeneffectView
@@ -287,8 +286,8 @@
 
         <Button
             android:id="@+id/btn_pen_cancel"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="@drawable/selector_ok"/>

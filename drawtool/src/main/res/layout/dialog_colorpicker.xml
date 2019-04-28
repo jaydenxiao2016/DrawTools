@@ -71,8 +71,8 @@
 
         <Button
             android:id="@+id/btn_colorpicker_ok"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="@drawable/selector_ok"/>
     </RelativeLayout>
 

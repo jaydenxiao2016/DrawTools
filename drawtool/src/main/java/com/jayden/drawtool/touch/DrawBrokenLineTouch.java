@@ -4,7 +4,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.DataInputStream;
@@ -14,11 +14,11 @@ import java.util.List;
 /**
  * 画折线
  */
-public class DrawBrokenlineTouch extends DrawTouch {
+public class DrawBrokenLineTouch extends DrawTouch {
     private boolean firstDown = true;
     private Path lastPath;
 
-    public DrawBrokenlineTouch() {
+    public DrawBrokenLineTouch() {
         super();
         lastPath = new Path();
     }
@@ -61,16 +61,18 @@ public class DrawBrokenlineTouch extends DrawTouch {
             endPoint.set(curPoint);
 
             if (hasFinished == true) {
-                newPel.closure = false;
+                newPel.closure = true;
                 super.up();
                 hasFinished = false;
                 firstDown = true;
             } else {
                 // //手指移动才生效
-                if(downPoint.x!=curPoint.x||downPoint.y!=curPoint.y) {
-                //路径组成的点
-                    newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
-                    lastPath.set(newPel.path);
+                if (downPoint.x != curPoint.x || downPoint.y != curPoint.y) {
+                    //路径组成的点
+                    if (newPel != null) {
+                        newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
+                        lastPath.set(newPel.path);
+                    }
                 }
             }
         }
@@ -79,7 +81,7 @@ public class DrawBrokenlineTouch extends DrawTouch {
     public boolean isNeedToOpenTools() {
         if (dis < 10f) {
             dis = 0;
-            MainActivity.openTools();
+            DrawMainActivity.openTools();
 
             return true;
         } else {

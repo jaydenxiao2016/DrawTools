@@ -14,16 +14,17 @@ import com.jayden.drawtool.bean.Picture;
 import java.util.ArrayList;
 import java.util.List;
 
-//调色板对话框
+/**
+ * 图片图元选择对话框
+ */
 public class PictureDialog extends Dialog {
     private OnClickPictureListener onClickPictureListener;
     private GridView gridView;
     private PictureAdapter adapter;
 
     // 构造函数
-    public PictureDialog(Context context, int theme, OnClickPictureListener onClickPictureListener) {
+    public PictureDialog(Context context, int theme) {
         super(context, theme);
-        this.onClickPictureListener = onClickPictureListener;
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,10 @@ public class PictureDialog extends Dialog {
                 dismiss();
             }
         });
+    }
+
+    public void setOnClickPictureListener(OnClickPictureListener onClickPictureListener) {
+        this.onClickPictureListener = onClickPictureListener;
     }
 
     public interface OnClickPictureListener {

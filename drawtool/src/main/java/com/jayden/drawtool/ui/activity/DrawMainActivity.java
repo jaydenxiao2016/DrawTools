@@ -26,7 +26,6 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -43,7 +42,7 @@ import com.jayden.drawtool.step.DrawPelStep;
 import com.jayden.drawtool.step.FillPelStep;
 import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.touch.DrawBesselTouch;
-import com.jayden.drawtool.touch.DrawBrokenlineTouch;
+import com.jayden.drawtool.touch.DrawBrokenLineTouch;
 import com.jayden.drawtool.touch.DrawFreehandTouch;
 import com.jayden.drawtool.touch.DrawLineTouch;
 import com.jayden.drawtool.touch.DrawOvalTouch;
@@ -52,28 +51,27 @@ import com.jayden.drawtool.touch.DrawRectTouch;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.touch.Touch;
 import com.jayden.drawtool.touch.TransformTouch;
-import com.jayden.drawtool.ui.dialog.ColorpickerDialog;
+import com.jayden.drawtool.ui.dialog.ColorPickerDialog;
 import com.jayden.drawtool.ui.dialog.PenDialog;
 import com.jayden.drawtool.ui.dialog.PictureDialog;
+import com.jayden.drawtool.ui.dialog.TextDialog;
 import com.jayden.drawtool.ui.view.CanvasView;
 import com.jayden.drawtool.utils.TimeUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
 /**
- * 类名：MainActivity.java
- * 描述：
+ * 类名：DrawMainActivity.java
+ * 描述：画图主界面
  * 公司：北京海鑫科鑫高科技股份有限公司
  * 作者：xsf
  * 创建时间：2019/4/10
  * 最后修改时间：2019/4/10
  */
-public class MainActivity extends AppCompatActivity {
+public class DrawMainActivity extends AppCompatActivity {
     /*************************************************/
     public static Context context;
     public static int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -81,14 +79,13 @@ public class MainActivity extends AppCompatActivity {
     private String savedImageDataPath;
 
     //内部算法
-    private List<Pel> pelList;
-    private Pel selectedPel;
-    private Stack<Step> undoStack;
+    private static List<Pel> pelList;
+    private static Pel selectedPel;
+    private static Stack<Step> undoStack;
     private static Stack<Step> redoStack;
     private static CanvasView canvasVi;
 
     /*************************************************/
-
     //控件;
     public static View[] allBtns;
     public static View topToolbarSclVi;
@@ -106,7 +103,9 @@ public class MainActivity extends AppCompatActivity {
 
     //对话框
     private PenDialog penDialog;//调色板对话框
-    private ColorpickerDialog colorpickerDialog;//调色板对话框
+    private ColorPickerDialog colorpickerDialog;//调色板对话框
+    private TextDialog textDialog;//文字对话框
+    private PictureDialog pictureDialog;//图文对话框
 
     //辅助用
     public static Button curToolVi;//工具条：当前选中的工具
@@ -126,9 +125,10 @@ public class MainActivity extends AppCompatActivity {
      * 入口
      *
      * @param context
+     * @param imageDataPath and图片数据文件路径
      */
     public static void startAction(Context context, String imageDataPath) {
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, DrawMainActivity.class);
         intent.putExtra("imageDataPath", imageDataPath);
         context.startActivity(intent);
     }
@@ -140,10 +140,6 @@ public class MainActivity extends AppCompatActivity {
         initView();
         initData();
     }
-
-    /*
-     * 自定义成员函数
-     */
 
     //初始化组件
     public void initView() {
@@ -178,14 +174,16 @@ public class MainActivity extends AppCompatActivity {
         curCanvasbgVi = whiteCanvasbgVi = (ImageView) canvasbgbarVi.findViewById(R.id.btn_canvasbg0);//初始化选中“黄纸背景”按钮
 
         //对话框
-        penDialog = new PenDialog(MainActivity.this, R.style.GraffitiDialog);
-        colorpickerDialog = new ColorpickerDialog(MainActivity.this, R.style.GraffitiDialog);
+        penDialog = new PenDialog(DrawMainActivity.this, R.style.GraffitiDialog);
+        colorpickerDialog = new ColorPickerDialog(DrawMainActivity.this, R.style.GraffitiDialog);
+        textDialog = new TextDialog(DrawMainActivity.this, R.style.GraffitiDialog);
+        pictureDialog = new PictureDialog(DrawMainActivity.this, R.style.GraffitiDialog);
     }
 
     //初始化数据
     public void initData() {
         //事先生成图片被存储的文件夹
-        File file = new File(Constant.savePath);
+        File file = new File(Constant.SAVE_PATH);
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         SCREEN_WIDTH = wm.getDefaultDisplay().getWidth();
         SCREEN_HEIGHT = wm.getDefaultDisplay().getHeight();
 
-        context = MainActivity.this;
+        context = DrawMainActivity.this;
         /**************************************************************************************/
         //数据结构
         pelList = CanvasView.getPelList();
@@ -259,12 +257,14 @@ public class MainActivity extends AppCompatActivity {
     public void onOpenPelbarBtn(View v) {
         ensureCanvasbgbarClosed();
         updateToolbarIcons(v);//更新工具条图标显示
-        if (pelbarPopwin.isShowing())//如果悬浮栏打开
+        if (pelbarPopwin.isShowing()) {
+            //如果悬浮栏打开
             pelbarPopwin.dismiss();//关闭
-        else
+        } else {
             pelbarPopwin.showAtLocation(downToolbarSclVi, Gravity.BOTTOM, 0, downToolbarSclVi.getHeight());//打开悬浮窗
-        //按下也要注册当前选中图元的touch
-        CanvasView.setTouch(new DrawFreehandTouch());
+        }
+        //更新touch
+        updatePelTouch();
     }
 
     //打开工具箱
@@ -314,31 +314,46 @@ public class MainActivity extends AppCompatActivity {
 
     //切换到文字界面
     public void onOpenDrawtextBtn(View v) {
-
-        final EditText editTxt = new EditText(this);//作品的名称编辑框
-        editTxt.setText("测试");
-        class okClick implements DialogInterface.OnClickListener {
-            public void onClick(DialogInterface dialog, int which) //ok
-            {
-                //内容
-                String content = editTxt.getText().toString();
-
+        textDialog.setOnClickTextListener(new TextDialog.OnClickTextListener() {
+            @Override
+            public void conClickContent(String content, boolean isVertical) {
                 //文本开始坐标
                 PointF beginPoint = new PointF(CanvasView.CANVAS_WIDTH / 2.5f, CanvasView.CANVAS_HEIGHT / 2.5f);
 
                 //内容宽高
                 Rect rect = new Rect();
                 PointF centerPoint = new PointF();
-                (canvasVi.getDrawTextPaint()).getTextBounds(content, 0, content.length(), rect);
-
-                //文本中心
-                centerPoint.set(new PointF(beginPoint.x + rect.width() / 2, beginPoint.y - rect.height() / 2));
+                //横向显示
+                if (!isVertical) {
+                    (canvasVi.getDrawTextPaint()).getTextBounds(content, 0, content.length(), rect);
+                    //文本中心
+                    centerPoint.set(new PointF(beginPoint.x + rect.width() / 2, beginPoint.y - rect.height() / 2));
+                }
+                //竖向显示
+                else {
+                    //主要是测量一行文字高度，使用“测试”而不用content是因为content为汉字字母混搭且第一个字符为字符时会有误差问题
+                    (canvasVi.getDrawTextPaint()).getTextBounds("测试", 0, 1, rect);
+                    //文本中心
+                    centerPoint.set(new PointF(beginPoint.x + rect.width() / 2, beginPoint.y - rect.height() * content.length() / 2));
+                }
 
                 //文本区域
                 Region region = new Region();
-                region.set((int) beginPoint.x, (int) beginPoint.y - rect.height(), (int) (beginPoint.x + rect.width()), (int) (beginPoint.y) + 10);
-
-                Text text = new Text(content);
+                //横向显示
+                if (!isVertical) {
+                    region.set((int) beginPoint.x - 10,
+                            (int) beginPoint.y - rect.height() - 10,
+                            (int) (beginPoint.x + rect.width() + 10),
+                            (int) (beginPoint.y) + 20);
+                }
+                //竖向显示
+                else {
+                    region.set((int) beginPoint.x - 10,
+                            (int) beginPoint.y - rect.height() * content.length() - 10,
+                            (int) (beginPoint.x + rect.width() + 10),
+                            (int) (beginPoint.y) + 20);
+                }
+                Text text = new Text(content, isVertical);
                 Pel newPel = new Pel();
                 newPel.type = 20;
                 newPel.text = text;
@@ -355,34 +370,19 @@ public class MainActivity extends AppCompatActivity {
 
                 //更新画布
                 canvasVi.updateSavedBitmap();
-
             }
-        }
-        class cancelClick implements DialogInterface.OnClickListener //cancel
-        {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        }
-
-        //实例化确认对话框
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setTitle("提示");
-        dialog.setView(editTxt);
-        dialog.setMessage("请输入文本");
-        dialog.setPositiveButton("确定", new okClick());
-        dialog.setNegativeButton("取消", new cancelClick());
-        dialog.create();
-        dialog.show();
+        });
+        textDialog.show();
     }
 
     //切换到插图界面
     public void onOpenDrawpictureBtn(View v) {
-        new PictureDialog(this, R.style.GraffitiDialog, new PictureDialog.OnClickPictureListener() {
+        pictureDialog.setOnClickPictureListener(new PictureDialog.OnClickPictureListener() {
             @Override
             public void conClickContent(int contentId) {
                 PointF beginPoint = new PointF(CanvasView.CANVAS_WIDTH / 2.5f, CanvasView.CANVAS_HEIGHT / 2.5f);
                 PointF centerPoint = new PointF();
-                Bitmap content = BitmapFactory.decodeResource(MainActivity.getContext().getResources(),
+                Bitmap content = BitmapFactory.decodeResource(DrawMainActivity.getContext().getResources(),
                         contentId);
                 centerPoint.set(beginPoint.x + content.getWidth() / 2, beginPoint.y + content.getHeight() / 2);
                 Picture picture = new Picture(contentId);
@@ -407,7 +407,8 @@ public class MainActivity extends AppCompatActivity {
                 //更新画布
                 canvasVi.updateSavedBitmap();
             }
-        }).show();
+        });
+        pictureDialog.show();
     }
 
     /**
@@ -441,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
     //画折线（子）
     public void onBrokenlineBtn(View v) {
         updatePelbarIcons((ImageView) v);
-        CanvasView.setTouch(new DrawBrokenlineTouch());
+        CanvasView.setTouch(new DrawBrokenLineTouch());
     }
 
     //自由手绘（子）
@@ -496,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
             }
             canvasVi.updateSavedBitmap();
         } else {
-            Toast.makeText(MainActivity.this, "请先选中一个图形！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DrawMainActivity.this, "请先选中一个图形！", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -509,23 +510,21 @@ public class MainActivity extends AppCompatActivity {
         {
             if (selectedPel.picture == null && selectedPel.text == null) {
                 Paint oldPaint = new Paint(selectedPel.paint);//设置旧画笔（undo用）
-
                 (selectedPel.paint).set(DrawTouch.getCurPaint());//以当前画笔的色态作为选中画笔的
-                if (selectedPel.closure == true)//封闭图形
+                if (selectedPel.closure == true) {//封闭图形
                     (selectedPel.paint).setStyle(Paint.Style.FILL);//填充区域
-                else
-                    (selectedPel.paint).setStyle(Paint.Style.STROKE);//填充边框
-
-                Paint newPaint = new Paint(selectedPel.paint);////设置新画笔（undo用）
-                undoStack.push(new FillPelStep(selectedPel, oldPaint, newPaint));//将该“步”压入undo栈
-
-                CanvasView.setSelectedPel(selectedPel = null);
-                canvasVi.updateSavedBitmap();//填充了图元就自然更新缓冲画布
+                    Paint newPaint = new Paint(selectedPel.paint);////设置新画笔（undo用）
+                    undoStack.push(new FillPelStep(selectedPel, oldPaint, newPaint));//将该“步”压入undo栈
+                    CanvasView.setSelectedPel(selectedPel = null);
+                    canvasVi.updateSavedBitmap();//填充了图元就自然更新缓冲画布
+                } else {
+                    Toast.makeText(DrawMainActivity.this, "只有封闭图元图形才支持填充！", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(MainActivity.this, "只有图元图形才支持填充！", Toast.LENGTH_LONG).show();
+                Toast.makeText(DrawMainActivity.this, "只有图元图形才支持填充！", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(MainActivity.this, "请先选中一个图形！", Toast.LENGTH_LONG).show();
+            Toast.makeText(DrawMainActivity.this, "请先选中一个图形！", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -542,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
             CanvasView.setSelectedPel(selectedPel = null);
             canvasVi.updateSavedBitmap();//删除了图元就自然更新缓冲画布
         } else {
-            Toast.makeText(MainActivity.this, "请先选中一个图形！", Toast.LENGTH_LONG).show();
+            Toast.makeText(DrawMainActivity.this, "请先选中一个图形！", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -624,6 +623,34 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         canvasVi.setBackgroundBitmap(backgroundDrawable);
+    }
+
+    /**
+     * 当前选中图元的touch
+     */
+    public void updatePelTouch() {
+        int i = curToolVi.getId();
+        if (i == R.id.btn_openpelbar) {
+            int i1 = curPelVi.getId();
+            if (i1 == R.id.btn_bessel) {
+                CanvasView.setTouch(new DrawBesselTouch());
+            } else if (i1 == R.id.btn_brokenline) {
+                CanvasView.setTouch(new DrawBrokenLineTouch());
+            } else if (i1 == R.id.btn_freehand) {
+                CanvasView.setTouch(new DrawFreehandTouch());
+            } else if (i1 == R.id.btn_line) {
+                CanvasView.setTouch(new DrawLineTouch());
+            } else if (i1 == R.id.btn_oval) {
+                CanvasView.setTouch(new DrawOvalTouch());
+            } else if (i1 == R.id.btn_polygon) {
+                CanvasView.setTouch(new DrawPolygonTouch());
+            } else if (i1 == R.id.btn_rect) {
+                CanvasView.setTouch(new DrawRectTouch());
+            }
+
+        } else if (i == R.id.btn_opentransbar) {
+            CanvasView.setTouch(new TransformTouch(this));
+        }
     }
 
     //更新工具条相关图标
@@ -730,17 +757,12 @@ public class MainActivity extends AppCompatActivity {
             if (touch instanceof DrawBesselTouch) {
                 touch.control = true;
                 touch.up();
-            } else if (touch instanceof DrawBrokenlineTouch) {
+            } else if (touch instanceof DrawBrokenLineTouch) {
                 touch.hasFinished = true;
                 touch.up();
             } else if (touch instanceof DrawPolygonTouch) {
                 (touch.curPoint).set(touch.beginPoint);
                 touch.up();
-            } else if (touch instanceof TransformTouch) {
-                TransformTouch transformTouch = (TransformTouch) touch;
-                CanvasView.setSelectedPel(null);
-                transformTouch.setSelectedPel(null);
-                canvasVi.updateSavedBitmap();//重绘位图
             } else //单纯选中
             {
                 CanvasView.setSelectedPel(null);//失去焦点
@@ -798,7 +820,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //实例化确认对话框
-        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(DrawMainActivity.this);
         dialog.setIcon(android.R.drawable.ic_dialog_info);
         dialog.setMessage("您确定要清空？");
         dialog.setPositiveButton("确定", new okClick());
@@ -810,8 +832,11 @@ public class MainActivity extends AppCompatActivity {
     //清空内部所有数据
     public void clearData() {
         pelList.clear();
+        canvasVi.pelList.clear();
         undoStack.clear();
+        canvasVi.undoStack.clear();
         redoStack.clear();
+        canvasVi.redoStack.clear();
         CanvasView.setSelectedPel(null);//若有选中的图元失去焦点
         updateCanvasbgAndIcons(whiteCanvasbgVi);//画布背景图标复位
         canvasVi.setBackgroundBitmap();//清除填充过颜色的地方
@@ -832,49 +857,23 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveBtn(final View v) {
         try {
             String currentDate = TimeUtils.getCurrentDate(TimeUtils.dateFormatYMDHMS);
-            savedImagePath = Constant.savePath + "/" + currentDate + ".jpg";
-            savedImageDataPath = Constant.savePath + "/" + currentDate + ".and";
+            savedImagePath = Constant.SAVE_PATH + "/" + currentDate + Constant.SAVE_IMAGE_FILE_SUFFIX;
+            savedImageDataPath = Constant.SAVE_PATH + "/" + currentDate + Constant.SAVE_DATA_FILE_SUFFIX;
             File file = new File(savedImagePath);
             if (!file.exists()) //文件不存在
             {
-                //保存图片
-                Bitmap bitmap = CanvasView.getSavedBitmap();
-                FileOutputStream fileOutputStream = new FileOutputStream(savedImagePath);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                fileOutputStream.close();
-                //保存and数据文件
-                canvasVi.saveFileData(savedImageDataPath);
-                Toast.makeText(MainActivity.this, "图片已保存在(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
-            } else //文件存在
-            {
-                //询问用户是否覆盖提示框
-                AlertDialog.Builder dialog1 = new AlertDialog.Builder(MainActivity.this);
-                dialog1.setTitle("提示");
-                dialog1.setIcon(android.R.drawable.ic_dialog_info);
-                dialog1.setMessage("该名称已存在，是否覆盖？");
-                dialog1.setPositiveButton("覆盖", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            Bitmap bitmap = CanvasView.getSavedBitmap();
-                            FileOutputStream fileOutputStream = new FileOutputStream(savedImagePath);
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                            try {
-                                fileOutputStream.close();
-                                Toast.makeText(MainActivity.this, "图片已保存(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-                dialog1.create();
-                dialog1.show();
+                if (CanvasView.pelList != null && CanvasView.pelList.size() > 0) {
+                    //保存图片
+                    Bitmap bitmap = CanvasView.getSavedBitmap();
+                    FileOutputStream fileOutputStream = new FileOutputStream(savedImagePath);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                    fileOutputStream.close();
+                    //保存and数据文件
+                    canvasVi.saveFileData(savedImageDataPath);
+                    Toast.makeText(DrawMainActivity.this, "图片已保存在(" + savedImagePath + ")", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(DrawMainActivity.this, "请至少画点啥东西吧", Toast.LENGTH_SHORT).show();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -883,7 +882,7 @@ public class MainActivity extends AppCompatActivity {
 
     //画廊
     public void onPhotoList(View view) {
-        GalleryActivity.startActionForResult(this,110);
+        GalleryActivity.startActionForResult(this, 110);
     }
 
     //换背景
@@ -976,7 +975,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**********************************************************************************/
     public void onOpenTransChildren(View v) {
-        View parentBtn = (View) findViewById(R.id.btn_opentranschildren);
+        ImageView parentBtn = (ImageView) findViewById(R.id.btn_opentranschildren);
 
         View deletepelBtn = (View) findViewById(R.id.btn_deletepel);
         View copypelBtn = (View) findViewById(R.id.btn_copypel);
@@ -984,15 +983,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (deletepelBtn.getVisibility() == View.GONE) {
-            parentBtn.setBackgroundDrawable(null);
-            parentBtn.setBackgroundResource(R.drawable.btn_arrow_close);
+            parentBtn.setImageResource(R.drawable.btn_arrow_close);
 
             deletepelBtn.setVisibility(View.VISIBLE);
             copypelBtn.setVisibility(View.VISIBLE);
             fillpelBtn.setVisibility(View.VISIBLE);
         } else {
-            parentBtn.setBackgroundDrawable(null);
-            parentBtn.setBackgroundResource(R.drawable.btn_arrow_open);
+            parentBtn.setImageResource(R.drawable.btn_arrow_open);
 
             deletepelBtn.setVisibility(View.GONE);
             copypelBtn.setVisibility(View.GONE);
@@ -1008,7 +1005,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK&&data!=null) {
+        if (resultCode == RESULT_OK && data != null) {
             imageDataPath = data.getStringExtra("imageDataPath");
             clearData();
             try {
@@ -1028,9 +1025,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
-                android.os.Process.killProcess(android.os.Process.myPid());
-                MainActivity.this.onDestroy();
-                System.exit(0);
+                clearData();
+                finish();
             }
             return true;
         }

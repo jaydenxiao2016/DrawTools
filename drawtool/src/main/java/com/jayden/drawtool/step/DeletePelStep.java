@@ -3,7 +3,9 @@ package com.jayden.drawtool.step;
 
 import com.jayden.drawtool.bean.Pel;
 
-//删除图元步骤
+/**
+ * 删除图元步骤
+ */
 public class DeletePelStep extends DrawPelStep
 {
 	public DeletePelStep(Pel pel)

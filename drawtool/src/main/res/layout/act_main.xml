@@ -38,61 +38,115 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/btn_deletepel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selector_corner"
-                android:onClick="onDeletepelBtn">
+                android:layout_gravity="right"
+                android:gravity="center"
+                android:onClick="onDeletepelBtn"
+                android:orientation="horizontal">
 
-                <ImageView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/btn_deletepel_normal"/>
-            </RelativeLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/iv_delete"
+                    android:background="@drawable/selector_gray_bg"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="删除"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"/>
 
-            <RelativeLayout
+                <ImageView
+                    android:id="@+id/iv_delete"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/selector_corner"
+                    android:padding="10dp"
+                    android:src="@drawable/btn_deletepel_normal"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btn_copypel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selector_corner"
+                android:layout_gravity="right"
+                android:gravity="center"
                 android:onClick="onCopypelBtn">
 
-                <ImageView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/btn_copypel_normal"/>
-            </RelativeLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/iv_copy"
+                    android:background="@drawable/selector_gray_bg"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="复制"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"/>
 
-            <RelativeLayout
+                <ImageView
+                    android:id="@+id/iv_copy"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/selector_corner"
+                    android:padding="10dp"
+                    android:src="@drawable/btn_copypel_normal"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btn_fillpel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selector_corner"
+                android:layout_gravity="right"
+                android:gravity="center"
                 android:onClick="onFillpelBtn">
 
-                <ImageView
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/btn_fillpel_normal"/>
-            </RelativeLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:layout_toLeftOf="@+id/iv_fill"
+                    android:background="@drawable/selector_gray_bg"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="填充"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"/>
 
-            <RelativeLayout
+                <ImageView
+                    android:id="@+id/iv_fill"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/selector_corner"
+                    android:padding="10dp"
+                    android:src="@drawable/btn_fillpel_normal"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/img_base_parent_normal"
+                android:layout_gravity="right"
+                android:gravity="center"
                 android:onClick="onOpenTransChildren">
 
                 <ImageView
                     android:id="@+id/btn_opentranschildren"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/btn_arrow_close"/>
-            </RelativeLayout>
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/img_base_parent_normal"
+                    android:padding="10dp"
+                    android:src="@drawable/btn_arrow_close"/>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -185,6 +239,7 @@
             android:drawableTop="@drawable/btn_save_normal"
             android:onClick="onSaveBtn"
             android:text="@string/tools_toptitle_txt_save"/>
+
         <Button
             android:id="@+id/btn_photo_list"
             style="@style/DrawToolButton"

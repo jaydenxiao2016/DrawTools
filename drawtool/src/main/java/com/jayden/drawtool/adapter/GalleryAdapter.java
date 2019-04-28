@@ -16,7 +16,7 @@ import com.jayden.drawtool.R;
  * 最后修改时间：2019/4/23
  */
 public class GalleryAdapter extends BaseAblistViewAdapter<String> {
-    private onClickGalleryLisetner onClickGalleryLisetner;
+    private onClickGalleryListener onClickGalleryListener;
 
     public GalleryAdapter(Context context) {
         super(context);
@@ -39,8 +39,8 @@ public class GalleryAdapter extends BaseAblistViewAdapter<String> {
         viewHolder.ivPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onClickGalleryLisetner != null) {
-                    onClickGalleryLisetner.onClick(position);
+                if (onClickGalleryListener != null) {
+                    onClickGalleryListener.onClick(position);
                 }
             }
         });
@@ -51,11 +51,11 @@ public class GalleryAdapter extends BaseAblistViewAdapter<String> {
         ImageView ivPicture;
     }
 
-    public void setOnClickGalleryLisetner(GalleryAdapter.onClickGalleryLisetner onClickGalleryLisetner) {
-        this.onClickGalleryLisetner = onClickGalleryLisetner;
+    public void setOnClickGalleryListener(onClickGalleryListener onClickGalleryListener) {
+        this.onClickGalleryListener = onClickGalleryListener;
     }
 
-    public interface onClickGalleryLisetner {
+    public interface onClickGalleryListener {
         void onClick(int position);
     }
 

@@ -6,7 +6,9 @@ import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 
-//变换图元步骤
+/**
+ * 编辑变换图元步骤
+ */
 public class TransformPelStep extends Step {
     private static Region clipRegion = CanvasView.getClipRegion();
     private Pel savedPel;

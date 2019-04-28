@@ -6,7 +6,7 @@ import android.graphics.RectF;
 
 /**
  * 类名：BasePel.java
- * 描述：
+ * 描述：基础图元
  * 作者：xsf
  * 创建时间：2019/4/12
  * 最后修改时间：2019/4/12
@@ -40,6 +40,9 @@ public class BasePel {
      */
     public Bitmap dragBitmap;
 
+    /**
+     * 以下参数保存文件时会进行保存
+     */
 
     /**
      * x偏移

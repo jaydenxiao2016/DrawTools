@@ -5,7 +5,9 @@ import android.graphics.Paint;
 import com.jayden.drawtool.bean.Pel;
 
 
-//填充图元步骤
+/**
+ * 填充图元步骤
+ */
 public class FillPelStep extends Step
 {
 	private Paint oldPaint,newPaint;

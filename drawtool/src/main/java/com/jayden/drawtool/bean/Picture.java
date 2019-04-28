@@ -4,12 +4,21 @@ package com.jayden.drawtool.bean;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 
 
 public class Picture {
+    /**
+     * 资源id
+     */
     private int contentId;
+    /**
+     * 图片bitmap
+     */
     private Bitmap content;
+    /**
+     * 图片名称
+     */
     private String name;
 
     public Picture(int contentId, String name) {
@@ -22,7 +31,7 @@ public class Picture {
     }
 
     public Bitmap createContent() {
-        content = BitmapFactory.decodeResource(MainActivity.getContext().getResources(),
+        content = BitmapFactory.decodeResource(DrawMainActivity.getContext().getResources(),
                 contentId);
         return content;
     }

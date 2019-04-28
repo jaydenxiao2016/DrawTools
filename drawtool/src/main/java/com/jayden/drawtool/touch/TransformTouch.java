@@ -16,7 +16,13 @@ import com.jayden.drawtool.ui.view.CanvasView;
 import java.util.ListIterator;
 
 
-//变换触摸类
+/**
+ * 类名：TransformTouch.java
+ * 描述：编辑变换触摸类
+ * 作者：xsf
+ * 创建时间：2019/4/10
+ * 最后修改时间：2019/4/10
+ */
 public class TransformTouch extends Touch {
 
     private Matrix cachedMatrix; //选中图元的最初因子
@@ -30,7 +36,7 @@ public class TransformTouch extends Touch {
     private static final int DRAG = 1; //缩放、旋转 操作
     private static final int TRANSLATE = 2; // 平移操作
     private static int mode = NONE; // 当前操作类型
-    private float dx, dy, oridx, oridy; //最初平移偏移量
+    private float oriDx, oriDy; //最初平移偏移量
     private static final float MIN_ZOOM = 0.3f; //缩放下限
 
     private Step step = null;
@@ -43,7 +49,7 @@ public class TransformTouch extends Touch {
         cachedMatrix = new Matrix();
         centerPoint = new PointF();
         savedPel = new Pel();
-        oridx = oridy = 0;
+        oriDx = oriDy = 0;
         originalRegionWidth = 0;
         originalRegionHeight = 0;
     }
@@ -64,10 +70,11 @@ public class TransformTouch extends Touch {
             while (pelIterator.hasNext()) {
                 Pel pel = pelIterator.next();
                 Rect bounds = (pel.region).getBounds();
-                RectF rect = new RectF();
-                RectF oldRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
-                Matrix cachedMatrix = new Matrix();
                 //开始位置
+                RectF oldRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
+                //变换后新位置
+                RectF rect = new RectF();
+                Matrix cachedMatrix = new Matrix();
                 cachedMatrix.setTranslate(pel.transDx, pel.transDy);
                 cachedMatrix.postScale(pel.scale, pel.scale, pel.centerPoint.x, pel.centerPoint.y);
                 cachedMatrix.postRotate(pel.degree, pel.centerPoint.x, pel.centerPoint.y);
@@ -144,11 +151,11 @@ public class TransformTouch extends Touch {
             if (mode == TRANSLATE)// 平移操作
             {
                 // 对选中图元施行平移变换
-                selectedPel.transDx = oridx + (curPoint.x - downPoint.x);
-                selectedPel.transDy = oridy + (curPoint.y - downPoint.y);
+                selectedPel.transDx = oriDx + (curPoint.x - downPoint.x);
+                selectedPel.transDy = oriDy + (curPoint.y - downPoint.y);
                 //重新设置矩阵中心点
                 centerPoint.set(calPelCenterPoint(selectedPel));
-                cachedMatrix.setTranslate(originalRect.left + oridx + (curPoint.x - downPoint.x), originalRect.top + oridy + (curPoint.y - downPoint.y)); // 作用于平移变换因子
+                cachedMatrix.setTranslate(originalRect.left + oriDx + (curPoint.x - downPoint.x), originalRect.top + oriDy + (curPoint.y - downPoint.y)); // 作用于平移变换因子
                 cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
                 cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
                 //重新确定四个点
@@ -156,7 +163,7 @@ public class TransformTouch extends Touch {
             } else if (mode == DRAG) // 缩放旋转操作
             {
                 //开始位置
-                cachedMatrix.setTranslate(originalRect.left + oridx, originalRect.top + oridy);
+                cachedMatrix.setTranslate(originalRect.left + oriDx, originalRect.top + oriDy);
                 //累计缩放倍数
                 selectedPel.scale = getScale(centerPoint,
                         new PointF(selectedPel.bottomRightPointF.x + selectedPel.transDx,
@@ -179,14 +186,14 @@ public class TransformTouch extends Touch {
     @Override
     public void up() {
         //为判断是否属于“选中（即秒抬）”情况
-        float disx = Math.abs(curPoint.x - downPoint.x);
-        float disy = Math.abs(curPoint.y - downPoint.y);
-        if ((disx > 2f || disy > 2f) && step != null) //移动距离至少要满足大于2f
+        float disX = Math.abs(curPoint.x - downPoint.x);
+        float disY = Math.abs(curPoint.y - downPoint.y);
+        if ((disX > 2f || disY > 2f) && step != null) //移动距离至少要满足大于2f
         {
             //敲定当前对应步骤
             if (selectedPel != null) {
-                oridx = selectedPel.transDx;
-                oridy = selectedPel.transDy;
+                oriDx = selectedPel.transDx;
+                oriDy = selectedPel.transDy;
                 step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
                 undoStack.push(step);//将该“步”压入undo栈
                 // 敲定此次操作的最终区域
@@ -213,14 +220,14 @@ public class TransformTouch extends Touch {
         selectedPel.rightBottomPoint = new PointF();
         selectedPel.dragBtnRect = new RectF();
         //初始化原有偏移，偏移是累计的
-        oridx = selectedPel.transDx;
-        oridy = selectedPel.transDy;
+        oriDx = selectedPel.transDx;
+        oriDy = selectedPel.transDy;
         //初始化变换矩阵中心点
         centerPoint.set(calPelCenterPoint(selectedPel));
         // 获取选中图元的初始matrix
         cachedMatrix = new Matrix();
         //开始位置
-        cachedMatrix.setTranslate(originalRect.left + oridx, originalRect.top + oridy);
+        cachedMatrix.setTranslate(originalRect.left + oriDx, originalRect.top + oriDy);
         cachedMatrix.postScale(selectedPel.scale, selectedPel.scale, centerPoint.x, centerPoint.y);
         cachedMatrix.postRotate(selectedPel.degree, centerPoint.x, centerPoint.y);
         //矩阵参数检查,设置4个点坐标
@@ -316,11 +323,6 @@ public class TransformTouch extends Touch {
      * 重新获取拖动按钮实际所在区域
      */
     private void reSetDragBtnRect() {
-        Rect bounds = selectedPel.region.getBounds();
-//        selectedPel.dragBtnRect = new RectF(bounds.right - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
-//                bounds.bottom - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
-//                bounds.right + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
-//                bounds.bottom + (selectedPel.dragBitmap.getHeight() * 1.0f / 2));
         selectedPel.dragBtnRect = new RectF(selectedPel.rightBottomPoint.x - (selectedPel.dragBitmap.getWidth() * 1.0f / 2),
                 selectedPel.rightBottomPoint.y - (selectedPel.dragBitmap.getHeight() * 1.0f / 2),
                 selectedPel.rightBottomPoint.x + (selectedPel.dragBitmap.getWidth() * 1.0f / 2),

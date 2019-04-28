@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DrawTool</string>
+    <string name="app_name">画图工具</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="processing_btn_yuantu">原图</string>

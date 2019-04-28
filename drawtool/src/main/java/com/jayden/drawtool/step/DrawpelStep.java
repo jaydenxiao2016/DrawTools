@@ -5,11 +5,19 @@ import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.List;
 
-//画图元步骤
+/**
+ * 画图元步骤
+ */
 public class DrawPelStep extends Step
 {
-	protected static List<Pel> pelList= CanvasView.getPelList(); // 图元链表
-	protected int location; //图元所在链表位置
+	/**
+	 * 图元链表
+	 */
+	protected static List<Pel> pelList= CanvasView.getPelList();
+	/**
+	 * 图元所在链表位置
+	 */
+	protected int location;
 
 	public DrawPelStep(Pel pel) //构造
 	{

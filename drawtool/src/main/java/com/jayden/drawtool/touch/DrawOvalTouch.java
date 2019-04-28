@@ -25,7 +25,7 @@ public class DrawOvalTouch extends DrawTouch {
         super.move();
 
         newPel = new Pel();
-        newPel.type=13;
+        newPel.type = 13;
         movePoint.set(curPoint);
 
         (newPel.path).addOval(new RectF(downPoint.x, downPoint.y, movePoint.x, movePoint.y), Path.Direction.CCW);
@@ -35,23 +35,25 @@ public class DrawOvalTouch extends DrawTouch {
 
     @Override
     public void up() {
-        newPel.closure = true;
         //路径组成的点
-        if((downPoint.x!=curPoint.x||downPoint.y!=curPoint.y)&& newPel!=null) {
-            newPel.pathPointFList.add(new PointF(downPoint.x,downPoint.y));
-            newPel.pathPointFList.add(new PointF(movePoint.x,movePoint.y));
+        if ((downPoint.x != curPoint.x || downPoint.y != curPoint.y) && newPel != null) {
+            newPel.closure = true;
+            newPel.pathPointFList.add(new PointF(downPoint.x, downPoint.y));
+            newPel.pathPointFList.add(new PointF(movePoint.x, movePoint.y));
         }
         super.up();
     }
+
     /**
      * 构造圆pel
+     *
      * @param in
      * @return
      */
-    public static Pel loadPel(DataInputStream in) throws Exception{
+    public static Pel loadPel(DataInputStream in) throws Exception {
         //点总数
         int pointSize = in.readInt();
-        List<PointF> pathPointFList=new ArrayList<>();
+        List<PointF> pathPointFList = new ArrayList<>();
         //点坐标
         for (int i = 0; i < pointSize; i++) {
             Float x = in.readFloat();

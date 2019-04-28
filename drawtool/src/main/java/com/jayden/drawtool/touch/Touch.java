@@ -8,7 +8,7 @@ import android.graphics.Region;
 
 import com.jayden.drawtool.bean.Pel;
 import com.jayden.drawtool.step.Step;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.util.List;
@@ -107,7 +107,7 @@ public class Touch {
     public void up() {
         if (dis < 10f) {
             dis = 0;
-            MainActivity.openTools();
+            DrawMainActivity.openTools();
             return;
         }
         dis = 0;

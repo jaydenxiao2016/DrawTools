@@ -1,10 +1,9 @@
 package com.jayden.drawtool.touch;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.DataInputStream;
@@ -66,7 +65,7 @@ public class DrawBesselTouch extends DrawTouch {
             endPoint.set(upPoint);//记录落脚点
             control = true;
         } else {
-            newPel.closure = false;
+            newPel.closure = true;
             //路径组成的点
             newPel.pathPointFList.add(new PointF(beginPoint.x,beginPoint.y));
             newPel.pathPointFList.add(new PointF(movePoint.x,movePoint.y));
@@ -79,9 +78,8 @@ public class DrawBesselTouch extends DrawTouch {
 
     public void ifNeedToOpenTools() {
         if (dis < 10f) {
-            Log.v("v", "ttttttttttttttttttttt" );
             dis = 0;
-            MainActivity.openTools();
+            DrawMainActivity.openTools();
             control = true;
             return;
         }

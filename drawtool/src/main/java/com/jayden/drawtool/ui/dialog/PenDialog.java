@@ -25,92 +25,89 @@ import com.jayden.drawtool.R;
 import com.jayden.drawtool.touch.DrawTouch;
 import com.jayden.drawtool.ui.view.PeneffectView;
 
-//笔触对话框
-public class PenDialog extends Dialog implements OnClickListener,OnSeekBarChangeListener
-{
-	private Paint paint = DrawTouch.getCurPaint();//获取当前绘制画笔
-	// 调整笔触相关控件
-	private PeneffectView peneffectVi;
-	private SeekBar penwidthSeekBar;
-	private TextView penwidthTextVi;
-	private Button cancelBtn;
-	
-	// 线形按钮
-	private Matrix matrix;
-	private static Button curShapeBtn;
-	private Button[] penshapeBtns = new Button[8];
-	private int[] penshapeBtnsId = new int[] 
-	{ R.id.btn_penshape1,R.id.btn_penshape2, R.id.btn_penshape3, R.id.btn_penshape4,
-	  R.id.btn_penshape5,R.id.btn_penshape6, R.id.btn_penshape7, R.id.btn_penshape8};
-	
-	//特效按钮
-	private static Button curEffectBtn;
-	private Button[] peneffectBtns = new Button[4];
-	private int[] peneffectBtnsId = new int[] 
-	{ R.id.btn_peneffect1,R.id.btn_peneffect2, R.id.btn_peneffect3, R.id.btn_peneffect4};
-	
-	// 构造函数
-	public PenDialog(Context context, int theme) {
-		super(context, theme);
-	}
+/**
+ * 笔触对话框
+ */
+public class PenDialog extends Dialog implements OnClickListener, OnSeekBarChangeListener {
+    private Paint paint = DrawTouch.getCurPaint();//获取当前绘制画笔
+    // 调整笔触相关控件
+    private PeneffectView peneffectVi;
+    private SeekBar penwidthSeekBar;
+    private TextView penwidthTextVi;
+    private Button cancelBtn;
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.dialog_pen);
-		setCanceledOnTouchOutside(true);
-		setCancelable(true);
-		initView();
-		initData();
-	}
+    // 线形按钮
+    private Matrix matrix;
+    private static Button curShapeBtn;
+    private Button[] penshapeBtns = new Button[8];
+    private int[] penshapeBtnsId = new int[]
+            {R.id.btn_penshape1, R.id.btn_penshape2, R.id.btn_penshape3, R.id.btn_penshape4,
+                    R.id.btn_penshape5, R.id.btn_penshape6, R.id.btn_penshape7, R.id.btn_penshape8};
 
-	// 初始化界面对象
-	private void initView() {
-		peneffectVi = (PeneffectView) findViewById(R.id.vi_peneffect);
-		penwidthSeekBar = (SeekBar) findViewById(R.id.seekbar_penwidth);
-		penwidthTextVi = (TextView) findViewById(R.id.textvi_penwidth);
-		cancelBtn = (Button) findViewById(R.id.btn_pen_cancel);
+    //特效按钮
+    private static Button curEffectBtn;
+    private Button[] peneffectBtns = new Button[4];
+    private int[] peneffectBtnsId = new int[]
+            {R.id.btn_peneffect1, R.id.btn_peneffect2, R.id.btn_peneffect3, R.id.btn_peneffect4};
 
-		matrix=new Matrix();
-		matrix.setSkew(2,2);
-		curShapeBtn=(Button)findViewById(R.id.btn_penshape1);
-		curEffectBtn=(Button)findViewById(R.id.btn_peneffect1);
-		//12线形按钮
-		for (int i = 0; i < penshapeBtns.length; i++) 
-		{
-			penshapeBtns[i] = (Button) findViewById(penshapeBtnsId[i]);
-		}
-		//4特效按钮
-		for(int i=0;i<peneffectBtns.length;i++)
-		{
-			peneffectBtns[i]=(Button) findViewById(peneffectBtnsId[i]);
-		}
-	}
+    // 构造函数
+    public PenDialog(Context context, int theme) {
+        super(context, theme);
+    }
 
-	// 初始化数据
-	private void initData() 
-	{
-		// 设置监听
-		penwidthSeekBar.setOnSeekBarChangeListener(this);
-		for (int i = 0; i < penshapeBtns.length; i++) //线形按钮
-		{
-			penshapeBtns[i].setOnClickListener(this);
-		}
-		for (int i = 0; i < peneffectBtns.length; i++) //特效按钮
-		{
-			peneffectBtns[i].setOnClickListener(this);
-		}		
-		cancelBtn.setOnClickListener(this);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.dialog_pen);
+        setCanceledOnTouchOutside(true);
+        setCancelable(true);
+        initView();
+        initData();
+    }
 
-		// 以当前画笔风格初始化特效区域
-		int curWidth = (int) (DrawTouch.getCurPaint()).getStrokeWidth();
-		penwidthSeekBar.setProgress(curWidth);
-		penwidthTextVi.setText(Integer.toString(curWidth));
+    // 初始化界面对象
+    private void initView() {
+        peneffectVi = (PeneffectView) findViewById(R.id.vi_peneffect);
+        penwidthSeekBar = (SeekBar) findViewById(R.id.seekbar_penwidth);
+        penwidthTextVi = (TextView) findViewById(R.id.textvi_penwidth);
+        cancelBtn = (Button) findViewById(R.id.btn_pen_cancel);
 
-		peneffectVi.invalidate();
-	}
+        matrix = new Matrix();
+        matrix.setSkew(2, 2);
+        curShapeBtn = (Button) findViewById(R.id.btn_penshape1);
+        curEffectBtn = (Button) findViewById(R.id.btn_peneffect1);
+        //12线形按钮
+        for (int i = 0; i < penshapeBtns.length; i++) {
+            penshapeBtns[i] = (Button) findViewById(penshapeBtnsId[i]);
+        }
+        //4特效按钮
+        for (int i = 0; i < peneffectBtns.length; i++) {
+            peneffectBtns[i] = (Button) findViewById(peneffectBtnsId[i]);
+        }
+    }
 
-	public void onClick(View v)
-	{
+    // 初始化数据
+    private void initData() {
+        // 设置监听
+        penwidthSeekBar.setOnSeekBarChangeListener(this);
+        for (int i = 0; i < penshapeBtns.length; i++) //线形按钮
+        {
+            penshapeBtns[i].setOnClickListener(this);
+        }
+        for (int i = 0; i < peneffectBtns.length; i++) //特效按钮
+        {
+            peneffectBtns[i].setOnClickListener(this);
+        }
+        cancelBtn.setOnClickListener(this);
+
+        // 以当前画笔风格初始化特效区域
+        int curWidth = (int) (DrawTouch.getCurPaint()).getStrokeWidth();
+        penwidthSeekBar.setProgress(curWidth);
+        penwidthTextVi.setText(Integer.toString(curWidth));
+
+        peneffectVi.invalidate();
+    }
+
+    public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_penshape1) {
             updatePenshapeIcons(v);
@@ -172,22 +169,20 @@ public class PenDialog extends Dialog implements OnClickListener,OnSeekBarChange
             this.dismiss();
         }
 
-		peneffectVi.invalidate();// 刷新特效区域
-	}
+        peneffectVi.invalidate();// 刷新特效区域
+    }
 
-	// 拖动的时候时刻更新粗细文本
-	public void onProgressChanged(SeekBar seekBar, int curWidth, boolean fromUser)
-	{
-		// 移到0的时候自动转换成1
-		if (curWidth == 0)
-		{
-			seekBar.setProgress(1);
-			curWidth=1;
-		}
+    // 拖动的时候时刻更新粗细文本
+    public void onProgressChanged(SeekBar seekBar, int curWidth, boolean fromUser) {
+        // 移到0的时候自动转换成1
+        if (curWidth == 0) {
+            seekBar.setProgress(1);
+            curWidth = 1;
+        }
 
-		penwidthTextVi.setText(Integer.toString(curWidth));//更新粗细文本
+        penwidthTextVi.setText(Integer.toString(curWidth));//更新粗细文本
 
-		//对于PathDashPathEffect特效要特殊处理
+        //对于PathDashPathEffect特效要特殊处理
         int i = curShapeBtn.getId();
         if (i == R.id.btn_penshape5) {
             Path p = new Path();
@@ -208,38 +203,34 @@ public class PenDialog extends Dialog implements OnClickListener,OnSeekBarChange
             p.addArc(new RectF(0, 0, curWidth + 4, curWidth + 4), 90, -90);
             paint.setPathEffect(new PathDashPathEffect(p, 2, 0, PathDashPathEffect.Style.TRANSLATE));
         }
-		
-		paint.setStrokeWidth(curWidth);//改变粗细
-		peneffectVi.invalidate();// 更新示意view
-	}
 
-	public void onStartTrackingTouch(SeekBar seekBar)
-	{
+        paint.setStrokeWidth(curWidth);//改变粗细
+        peneffectVi.invalidate();// 更新示意view
+    }
 
-	}
+    public void onStartTrackingTouch(SeekBar seekBar) {
 
-	// 放开拖动条后 重绘特效示意区域
-	public void onStopTrackingTouch(SeekBar seekBar)
-	{
-		
-	}
-	
-	/**
-	 * 辅助用
-	 */
-	//更新线形箱相关图标
-	public void updatePenshapeIcons(View v)
-	{
-		curShapeBtn.setTextColor(Color.parseColor("#ff666666"));
-		curShapeBtn=(Button)v;
-		curShapeBtn.setTextColor(Color.parseColor("#0099CC"));
-	}
-	
-	//更新特效箱相关图标
-	public void updatePeneffectIcons(View v)
-	{	
-		curEffectBtn.setTextColor(Color.parseColor("#ff666666"));
-		curEffectBtn=(Button)v;
-		curEffectBtn.setTextColor(Color.parseColor("#0099CC"));
-	}
+    }
+
+    // 放开拖动条后 重绘特效示意区域
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    /**
+     * 辅助用
+     */
+    //更新线形箱相关图标
+    public void updatePenshapeIcons(View v) {
+        curShapeBtn.setTextColor(Color.parseColor("#ff666666"));
+        curShapeBtn = (Button) v;
+        curShapeBtn.setTextColor(Color.parseColor("#0099CC"));
+    }
+
+    //更新特效箱相关图标
+    public void updatePeneffectIcons(View v) {
+        curEffectBtn.setTextColor(Color.parseColor("#ff666666"));
+        curEffectBtn = (Button) v;
+        curEffectBtn.setTextColor(Color.parseColor("#0099CC"));
+    }
 }

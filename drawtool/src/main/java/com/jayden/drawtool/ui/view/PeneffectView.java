@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.jayden.drawtool.touch.DrawTouch;
-import com.jayden.drawtool.ui.activity.MainActivity;
+import com.jayden.drawtool.ui.activity.DrawMainActivity;
 
 /**
  * 画笔粗细形状
@@ -29,7 +29,7 @@ public class PeneffectView extends View {
     public void initPath() {
         path = new Path();
 
-        float width = MainActivity.SCREEN_WIDTH;
+        float width = DrawMainActivity.SCREEN_WIDTH;
         float height = 160;
 
         path.moveTo(0, height / 2);

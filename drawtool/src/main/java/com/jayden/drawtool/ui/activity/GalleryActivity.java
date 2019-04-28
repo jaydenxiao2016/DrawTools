@@ -15,6 +15,8 @@ import com.jayden.drawtool.adapter.GalleryAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -49,7 +51,7 @@ public class GalleryActivity extends AppCompatActivity {
         gridView.setFocusable(true);
         adapter = new GalleryAdapter(this);
         adapter.reset(imagePathList);
-        adapter.setOnClickGalleryLisetner(new GalleryAdapter.onClickGalleryLisetner() {
+        adapter.setOnClickGalleryListener(new GalleryAdapter.onClickGalleryListener() {
             @Override
             public void onClick(int position) {
                 if (imageDataPathList != null && imageDataPathList.size() > position) {
@@ -68,7 +70,7 @@ public class GalleryActivity extends AppCompatActivity {
     private void initData() {
         imagePathList = new ArrayList<String>();
         imageDataPathList = new ArrayList<String>();
-        String photosPath = Constant.savePath + "/";
+        String photosPath = Constant.SAVE_PATH + "/";
         File f = new File(photosPath);
         File[] files = f.listFiles();
         /**
@@ -82,10 +84,22 @@ public class GalleryActivity extends AppCompatActivity {
                 imageDataPathList.add(file.getAbsolutePath());
             }
         }
+        Collections.sort(imagePathList, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+                return rhs.compareTo(lhs);
+            }
+        });
+        Collections.sort(imageDataPathList, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+                return rhs.compareTo(lhs);
+            }
+        });
         if (files.length == 0)
-            Toast.makeText(MainActivity.getContext(), "画廊里暂时还没有作品", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DrawMainActivity.getContext(), "画廊里暂时还没有作品", Toast.LENGTH_SHORT).show();
         else
-            Toast.makeText(MainActivity.getContext(), "点击图片可以重新载入编辑", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DrawMainActivity.getContext(), "点击图片可以重新载入编辑", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -120,10 +134,10 @@ public class GalleryActivity extends AppCompatActivity {
         boolean re;
         /* 取得扩展名 */
         String end = fName
-                .substring(fName.lastIndexOf(".") + 1, fName.length())
+                .substring(fName.lastIndexOf("."), fName.length())
                 .toLowerCase();
         /* 按扩展名的类型决定MimeType */
-        if (end.equals("txt")) {
+        if (end.equals(Constant.SAVE_DATA_FILE_SUFFIX)) {
             re = true;
         } else {
             re = false;

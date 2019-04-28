@@ -3,7 +3,6 @@ package com.jayden.drawtool.ui.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,9 +16,13 @@ import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
 
-//调色板对话框
-public class ColorpickerDialog extends Dialog implements OnClickListener {
-    //调色板控件相关
+/**
+ * 调色板对话框
+ */
+public class ColorPickerDialog extends Dialog implements OnClickListener {
+    /**
+     * 调色板控件相关
+     */
     public ColorPicker picker;
     private OpacityBar opacityBar;
     private SaturationBar saturationBar;
@@ -27,7 +30,7 @@ public class ColorpickerDialog extends Dialog implements OnClickListener {
 
     private Button okBtn;
 
-    public ColorpickerDialog(Context context, int theme) {
+    public ColorPickerDialog(Context context, int theme) {
         super(context, theme);
     }
 
@@ -40,26 +43,29 @@ public class ColorpickerDialog extends Dialog implements OnClickListener {
         initData();
     }
 
-    //初始化界面对象
+    /**
+     * 初始化界面对象
+     */
     private void initView() {
         //找到实例对象
         picker = (ColorPicker) findViewById(R.id.colorpicker_picker);
         opacityBar = (OpacityBar) findViewById(R.id.colorpicker_opacitybar);
         saturationBar = (SaturationBar) findViewById(R.id.colorpicker_saturationbar);
         valueBar = (ValueBar) findViewById(R.id.colorpicker_valuebar);
-
         //按钮对象
         okBtn = (Button) findViewById(R.id.btn_colorpicker_ok);
     }
 
-    //初始化数据
+    /**
+     * 初始化数据
+     */
     private void initData() {
         //使环形取色器和拖动条建立关系
         picker.addOpacityBar(opacityBar);
         picker.addSaturationBar(saturationBar);
         picker.addValueBar(valueBar);
-        picker.setColor(Color.parseColor("#ff298ecb"));//初始化为黄色
-
+        //初始化当前画笔颜色
+        picker.setColor( DrawTouch.getCurPaint().getColor());
         okBtn.setOnClickListener(this);
     }
 
@@ -67,8 +73,8 @@ public class ColorpickerDialog extends Dialog implements OnClickListener {
         int i = v.getId();
         if (i == R.id.btn_colorpicker_ok) {
             int curColor = picker.getColor();
-            DrawTouch.getCurPaint().setColor(curColor);//设置当前颜色(MainActivity.colorBtn).setTextColor(curColor);//改变颜色二字if(DrawTextActivity.drawTextVi != null)//是在编辑文字界面打开的
-            this.dismiss();//关闭对话框
+            DrawTouch.getCurPaint().setColor(curColor);
+            this.dismiss();
         }
     }
 }
