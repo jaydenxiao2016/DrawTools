@@ -373,4 +373,8 @@ public class TransformTouch extends Touch {
 
         return new PointF((boundRect.right + boundRect.left) / 2 + selectedPel.transDx, (boundRect.bottom + boundRect.top) / 2 + selectedPel.transDy);
     }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

@@ -1,5 +1,6 @@
 package com.jayden.drawtool.ui.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.github.dfqin.grantor.PermissionListener;
+import com.github.dfqin.grantor.PermissionsUtil;
 import com.jayden.drawtool.Constant;
 import com.jayden.drawtool.R;
 import com.jayden.drawtool.bean.Pel;
@@ -137,9 +141,28 @@ public class DrawMainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         imageDataPath = getIntent().getStringExtra("imageDataPath");
-        initView();
-        initData();
+        requestWritePermission();
     }
+
+    /**
+     * 写外卡动态权限
+     */
+    private void requestWritePermission() {
+        PermissionsUtil.requestPermission(getApplication(), new PermissionListener() {
+            @Override
+            public void permissionGranted(@NonNull String[] permissions) {
+                initView();
+                initData();
+            }
+
+            @Override
+            public void permissionDenied(@NonNull String[] permissions) {
+                Toast.makeText(DrawMainActivity.this, "请先允许写外存储卡权限", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
 
     //初始化组件
     public void initView() {
@@ -1026,6 +1049,10 @@ public class DrawMainActivity extends AppCompatActivity {
                 exitTime = System.currentTimeMillis();
             } else {
                 clearData();
+                if (CanvasView.getTouch() instanceof TransformTouch) {
+                    TransformTouch touch = (TransformTouch) CanvasView.getTouch();
+                    touch.setContext(null);
+                }
                 finish();
             }
             return true;
