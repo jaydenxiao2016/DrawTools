@@ -11,7 +11,7 @@ import com.jayden.drawtool.ui.view.CanvasView;
  * 创建时间：2019/4/10
  * 最后修改时间：2019/4/10
  */
-public class Step {
+public abstract class Step {
     /**
      * 通知重绘用
      */
