@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,10 +12,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -82,7 +78,9 @@ public class DrawMainActivity extends AppCompatActivity {
     private String savedImagePath;
     private String savedImageDataPath;
 
-    //内部算法
+    /**
+     * 内部算法
+     */
     private static List<Pel> pelList;
     private static Pel selectedPel;
     private static Stack<Step> undoStack;
@@ -90,39 +88,36 @@ public class DrawMainActivity extends AppCompatActivity {
     private static CanvasView canvasVi;
 
     /*************************************************/
-    //控件;
-    public static View[] allBtns;
+    /**
+     * 控件
+     */
+    private static View[] allBtns;
     public static View topToolbarSclVi;
     private static View downToolbarSclVi;
     private static ImageView undoBtn;
     private static ImageView redoBtn;
-    private Button openPelbarBtn;
-    private static View transbarLinlayout;
-
-    private static PopupWindow pelbarPopwin;
-    private static PopupWindow canvasbgbarPopwin;
-
+    private Button openPelBarBtn;
+    private static View transBarLinearLayout;
+    private static PopupWindow pelBarPopWindow;
     private static Button extendBtn;
-    public static Button colorBtn;//颜色按钮变字用
 
-    //对话框
+    /**
+     * 对话框
+     */
     private PenDialog penDialog;//调色板对话框
     private ColorPickerDialog colorpickerDialog;//调色板对话框
     private TextDialog textDialog;//文字对话框
     private PictureDialog pictureDialog;//图文对话框
 
-    //辅助用
+    /**
+     * 辅助用
+     */
     public static Button curToolVi;//工具条：当前选中的工具
     private static ImageView curPelVi;//图元条：当前选中的图元
-    private ImageView curCanvasbgVi, whiteCanvasbgVi;//背景条：当前选中的背景
     /**************************************************************************************/
-    //拍照
-    private static final int REQUEST_CODE_NONE = 0;
-    private static final int REQUEST_CODE_GRAPH = 1;//拍照
-    private static final int REQUEST_CODE_PICTURE = 2; //缩放
-    private static final String IMAGE_UNSPECIFIED = "image/*";
-    /**************************************************************************************/
-
+    /**
+     * 数据文件路径
+     */
     private String imageDataPath;
 
     /**
@@ -140,6 +135,7 @@ public class DrawMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.act_main);
         imageDataPath = getIntent().getStringExtra("imageDataPath");
         requestWritePermission();
     }
@@ -166,19 +162,17 @@ public class DrawMainActivity extends AppCompatActivity {
 
     //初始化组件
     public void initView() {
-        setContentView(R.layout.act_main);
         //根据id关联基本原始组件
         canvasVi = (CanvasView) findViewById(R.id.vi_canvas);
         extendBtn = (Button) findViewById(R.id.btn_extend);
-        openPelbarBtn = (Button) findViewById(R.id.btn_openpelbar);
+        openPelBarBtn = (Button) findViewById(R.id.btn_openpelbar);
         topToolbarSclVi = (View) findViewById(R.id.sclvi_toptoolbar);
         downToolbarSclVi = (View) findViewById(R.id.sclvi_downtoolbar);
         undoBtn = (ImageView) findViewById(R.id.btn_undo);
         redoBtn = (ImageView) findViewById(R.id.btn_redo);
-        transbarLinlayout = (View) findViewById(R.id.linlay_transbar);
-        colorBtn = (Button) findViewById(R.id.btn_color);
-        int[] btnIds = new int[]{R.id.btn_openpelbar, R.id.btn_opentransbar,
-                R.id.btn_opencanvasbgbar, R.id.btn_openprocessingbar, R.id.btn_opendrawtext, R.id.btn_opendrawpicture, R.id.btn_color, R.id.btn_pen, R.id.btn_clear, R.id.btn_save,
+        transBarLinearLayout = (View) findViewById(R.id.linlay_transbar);
+        int[] btnIds = new int[]{R.id.btn_openpelbar, R.id.btn_opentransbar, R.id.btn_opendrawtext,
+                R.id.btn_opendrawpicture, R.id.btn_color, R.id.btn_pen, R.id.btn_clear, R.id.btn_save,
                 R.id.btn_undo, R.id.btn_redo};
         allBtns = new View[btnIds.length];
         for (int i = 0; i < btnIds.length; i++)
@@ -187,14 +181,11 @@ public class DrawMainActivity extends AppCompatActivity {
         //构造弹出式窗体
         //图元箱\变换箱\浏览箱\背景箱\填拷删箱
         View pelbarVi = this.getLayoutInflater().inflate(R.layout.popwin_pelbar, null);
-        pelbarPopwin = new PopupWindow(pelbarVi, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        View canvasbgbarVi = this.getLayoutInflater().inflate(R.layout.popwin_canvasbgbar, null);
-        canvasbgbarPopwin = new PopupWindow(canvasbgbarVi, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        pelBarPopWindow = new PopupWindow(pelbarVi, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         //根据id初始化关联选中的组件
-        curToolVi = openPelbarBtn;//初始化选中图元按钮
+        curToolVi = openPelBarBtn;//初始化选中图元按钮
         curPelVi = (ImageView) pelbarVi.findViewById(R.id.btn_freehand);//初始化选中自由手绘按钮
-        curCanvasbgVi = whiteCanvasbgVi = (ImageView) canvasbgbarVi.findViewById(R.id.btn_canvasbg0);//初始化选中“黄纸背景”按钮
 
         //对话框
         penDialog = new PenDialog(DrawMainActivity.this, R.style.GraffitiDialog);
@@ -238,7 +229,6 @@ public class DrawMainActivity extends AppCompatActivity {
     //关闭工具箱
     public static void closeTools() {
         ensurePelbarClosed();
-        ensureCanvasbgbarClosed();
         clearRedoStack();//清空重做栈
 
         if (curToolVi.getId() == R.id.btn_opentransbar)
@@ -266,8 +256,8 @@ public class DrawMainActivity extends AppCompatActivity {
         if (curToolVi.getId() == R.id.btn_opentransbar) //若为选中模式
         {
             Animation leftAppearAnim = AnimationUtils.loadAnimation(context, R.anim.leftappear);
-            transbarLinlayout.setVisibility(View.VISIBLE); //显示变换箱
-            transbarLinlayout.startAnimation(leftAppearAnim);
+            transBarLinearLayout.setVisibility(View.VISIBLE); //显示变换箱
+            transBarLinearLayout.startAnimation(leftAppearAnim);
         } else if (curPelVi.getId() == R.id.btn_brokenline
                 || curPelVi.getId() == R.id.btn_polygon) {
             extendBtn.setVisibility(View.VISIBLE);
@@ -278,13 +268,12 @@ public class DrawMainActivity extends AppCompatActivity {
 
     //打开图形条
     public void onOpenPelbarBtn(View v) {
-        ensureCanvasbgbarClosed();
         updateToolbarIcons(v);//更新工具条图标显示
-        if (pelbarPopwin.isShowing()) {
+        if (pelBarPopWindow.isShowing()) {
             //如果悬浮栏打开
-            pelbarPopwin.dismiss();//关闭
+            pelBarPopWindow.dismiss();//关闭
         } else {
-            pelbarPopwin.showAtLocation(downToolbarSclVi, Gravity.BOTTOM, 0, downToolbarSclVi.getHeight());//打开悬浮窗
+            pelBarPopWindow.showAtLocation(downToolbarSclVi, Gravity.BOTTOM, 0, downToolbarSclVi.getHeight());//打开悬浮窗
         }
         //更新touch
         updatePelTouch();
@@ -292,8 +281,8 @@ public class DrawMainActivity extends AppCompatActivity {
 
     //打开工具箱
     public static void openTools() {
-        if (transbarLinlayout.getVisibility() == View.VISIBLE) //如果变换箱为打开状态
-            transbarLinlayout.setVisibility(View.GONE);//关闭
+        if (transBarLinearLayout.getVisibility() == View.VISIBLE) //如果变换箱为打开状态
+            transBarLinearLayout.setVisibility(View.GONE);//关闭
 
         extendBtn.setVisibility(View.GONE);
         //弹出上下工具栏的动画
@@ -315,24 +304,9 @@ public class DrawMainActivity extends AppCompatActivity {
     //打开变换条
     public void onOpenTransbarBtn(View v) {
         ensurePelbarClosed();
-        ensureCanvasbgbarClosed();
         updateToolbarIcons(v);
         closeTools();
         CanvasView.setTouch(new TransformTouch(this));
-    }
-
-    //打开背景条
-    public void onOpenCanvasbgbarBtn(View v) {
-        ensurePelbarClosed();
-        if (canvasbgbarPopwin.isShowing())//如果悬浮栏打开
-            canvasbgbarPopwin.dismiss();//关闭
-        else
-            canvasbgbarPopwin.showAtLocation(downToolbarSclVi, Gravity.BOTTOM, 0, downToolbarSclVi.getHeight());//打开悬浮窗
-    }
-
-    //切换到图片处理页面
-    public void onOpenProcessingbarBtn(View v) {
-
     }
 
     //切换到文字界面
@@ -609,45 +583,6 @@ public class DrawMainActivity extends AppCompatActivity {
         curToolVi.setCompoundDrawablesWithIntrinsicBounds(null, fatherDrawable, null, null);
     }
 
-    //更新画布背景箱相关图标
-    public void updateCanvasbgAndIcons(ImageView v) {
-        //去框、加框
-        curCanvasbgVi.setImageDrawable(null);//上次选中的图元去框
-        v.setImageResource(R.drawable.bg_highlight_frame);//改变子菜单的图片（加框）
-        curCanvasbgVi = v;//转接当前选中
-
-        int backgroundDrawable = 0;
-        int i = v.getId();
-        if (i == R.id.btn_canvasbg0) {
-            backgroundDrawable = R.drawable.bg_canvas0;
-
-        } else if (i == R.id.btn_canvasbg1) {
-            backgroundDrawable = R.drawable.bg_canvas1;
-
-        } else if (i == R.id.btn_canvasbg2) {
-            backgroundDrawable = R.drawable.bg_canvas2;
-
-        } else if (i == R.id.btn_canvasbg3) {
-            backgroundDrawable = R.drawable.bg_canvas3;
-
-        } else if (i == R.id.btn_canvasbg4) {
-            backgroundDrawable = R.drawable.bg_canvas4;
-
-        } else if (i == R.id.btn_canvasbg5) {
-            backgroundDrawable = R.drawable.bg_canvas5;
-
-        } else if (i == R.id.btn_canvasbg6) {
-            backgroundDrawable = R.drawable.bg_canvas6;
-
-        } else if (i == R.id.btn_canvasbg7) {
-            backgroundDrawable = R.drawable.bg_canvas7;
-
-        } else {
-            return;
-        }
-        canvasVi.setBackgroundBitmap(backgroundDrawable);
-    }
-
     /**
      * 当前选中图元的touch
      */
@@ -760,14 +695,8 @@ public class DrawMainActivity extends AppCompatActivity {
      */
     //确保悬浮图形条关闭
     private static void ensurePelbarClosed() {
-        if (pelbarPopwin.isShowing())//如果悬浮栏打开
-            pelbarPopwin.dismiss();//关闭
-    }
-
-    //确保悬浮背景条关闭
-    private static void ensureCanvasbgbarClosed() {
-        if (canvasbgbarPopwin.isShowing())
-            canvasbgbarPopwin.dismiss();//关闭
+        if (pelBarPopWindow.isShowing())//如果悬浮栏打开
+            pelBarPopWindow.dismiss();//关闭
     }
 
     //确保未画完的图元能够真正敲定
@@ -861,7 +790,6 @@ public class DrawMainActivity extends AppCompatActivity {
         redoStack.clear();
         canvasVi.redoStack.clear();
         CanvasView.setSelectedPel(null);//若有选中的图元失去焦点
-        updateCanvasbgAndIcons(whiteCanvasbgVi);//画布背景图标复位
         canvasVi.setBackgroundBitmap();//清除填充过颜色的地方
     }
 
@@ -908,67 +836,6 @@ public class DrawMainActivity extends AppCompatActivity {
         GalleryActivity.startActionForResult(this, 110);
     }
 
-    //换背景
-    public void onCanvasbg0Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg1Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg2Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg3Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg4Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg5Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg6Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    public void onCanvasbg7Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-    }
-
-    //图库
-    public void onCanvasbg8Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-        Intent intent = new Intent(Intent.ACTION_PICK, null);
-        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_UNSPECIFIED);
-        startActivityForResult(intent, REQUEST_CODE_PICTURE);
-
-    }
-
-    //拍照
-    public void onCanvasbg9Btn(View v) {
-        updateCanvasbgAndIcons((ImageView) v);
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "temp.jpg")));
-        intent.putExtra("outputFormat", Bitmap.CompressFormat.PNG.name());
-        intent.putExtra(MediaStore.EXTRA_SCREEN_ORIENTATION, Configuration.ORIENTATION_LANDSCAPE);
-        startActivityForResult(intent, REQUEST_CODE_GRAPH);
-
-    }
-
-    /*************************************************************************************/
-/**
- * 辅助方法
- */
-    /**
-     * get()
-     */
 
     public static CanvasView getCanvasView() {
         return canvasVi;
@@ -978,25 +845,6 @@ public class DrawMainActivity extends AppCompatActivity {
         return context;
     }
 
-
-    public void addRecognizedPel(Pel recognizedPel) {
-        /**
-         * 公共操作
-         */
-        //包装图元
-        (recognizedPel.region).setPath(recognizedPel.path, CanvasView.getClipRegion());
-        (recognizedPel.paint).set(DrawTouch.getCurPaint());
-
-        //更新数据
-        pelList.add(recognizedPel);//加入链表
-        undoStack.push(new DrawPelStep(recognizedPel));//将该“步”压入undo栈
-
-        //更新画布
-        CanvasView.setSelectedPel(selectedPel = null);//刚才画的图元失去焦点
-        canvasVi.updateSavedBitmap();//重绘位图
-    }
-
-    /**********************************************************************************/
     public void onOpenTransChildren(View v) {
         ImageView parentBtn = (ImageView) findViewById(R.id.btn_opentranschildren);
 

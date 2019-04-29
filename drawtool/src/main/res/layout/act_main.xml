@@ -219,14 +219,6 @@
             android:text="@string/tools_toptitle_txt_pen"/>
 
         <Button
-            android:id="@+id/btn_openprocessingbar"
-            style="@style/DrawToolButton"
-            android:drawableTop="@drawable/btn_processing_normal"
-            android:onClick="onOpenProcessingbarBtn"
-            android:text="@string/tools_bottomtitle_txt_openprocessingbar"
-            android:visibility="gone"/>
-
-        <Button
             android:id="@+id/btn_clear"
             style="@style/DrawToolButton"
             android:drawableTop="@drawable/btn_clear_normal"
@@ -269,14 +261,6 @@
             android:drawableTop="@drawable/btn_selectpel_normal"
             android:onClick="onOpenTransbarBtn"
             android:text="@string/tools_bottomtitle_txt_opentransbar"/>
-
-        <Button
-            android:id="@+id/btn_opencanvasbgbar"
-            style="@style/DrawToolButton"
-            android:drawableTop="@drawable/btn_setbg_normal"
-            android:onClick="onOpenCanvasbgbarBtn"
-            android:text="@string/tools_bottomtitle_txt_opencanvasbgbar"
-            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_opendrawtext"

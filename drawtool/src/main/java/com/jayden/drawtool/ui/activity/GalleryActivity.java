@@ -1,7 +1,9 @@
 package com.jayden.drawtool.ui.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,8 @@ public class GalleryActivity extends AppCompatActivity {
     private GridView gridView;
     private List<String> imagePathList;
     private List<String> imageDataPathList;
+    private AsyncTask<Void, Void, Void> asyncTask;
+    private ProgressDialog progressDialog;
 
     /**
      * 入库
@@ -47,10 +51,16 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_gallery);
         initData();
+        initView();
+    }
+
+    /**
+     * 初始化view
+     */
+    private void initView() {
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setFocusable(true);
         adapter = new GalleryAdapter(this);
-        adapter.reset(imagePathList);
         adapter.setOnClickGalleryListener(new GalleryAdapter.onClickGalleryListener() {
             @Override
             public void onClick(int position) {
@@ -67,39 +77,78 @@ public class GalleryActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
     }
 
+    /**
+     * 初始化数据
+     */
     private void initData() {
-        imagePathList = new ArrayList<String>();
-        imageDataPathList = new ArrayList<String>();
-        String photosPath = Constant.SAVE_PATH + "/";
-        File f = new File(photosPath);
-        File[] files = f.listFiles();
-        /**
-         * 将所有文件存入ArrayList中,这个地方存的还是文件路径
-         */
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (isImage(file.getAbsolutePath())) {
-                imagePathList.add(file.getAbsolutePath());
-            } else if (isImageData(file.getAbsolutePath())) {
-                imageDataPathList.add(file.getAbsolutePath());
-            }
-        }
-        Collections.sort(imagePathList, new Comparator<String>() {
+        imagePathList = new ArrayList<>();
+        imageDataPathList = new ArrayList<>();
+        asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
-            public int compare(String lhs, String rhs) {
-                return rhs.compareTo(lhs);
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = ProgressDialog.show(GalleryActivity.this, "提示", "正在加载数据中...");
             }
-        });
-        Collections.sort(imageDataPathList, new Comparator<String>() {
+
             @Override
-            public int compare(String lhs, String rhs) {
-                return rhs.compareTo(lhs);
+            protected Void doInBackground(Void... voids) {
+                if (asyncTask != null && !asyncTask.isCancelled()) {
+                    String photosPath = Constant.SAVE_PATH + "/";
+                    File f = new File(photosPath);
+                    File[] files = f.listFiles();
+                    /**
+                     * 将所有文件存入ArrayList中,这个地方存的还是文件路径
+                     */
+                    for (int i = 0; i < files.length; i++) {
+                        File file = files[i];
+                        if (isImage(file.getAbsolutePath())) {
+                            imagePathList.add(file.getAbsolutePath());
+                        } else if (isImageData(file.getAbsolutePath())) {
+                            imageDataPathList.add(file.getAbsolutePath());
+                        }
+                    }
+                    /**
+                     * 按时间降序
+                     */
+                    Collections.sort(imagePathList, new Comparator<String>() {
+                        @Override
+                        public int compare(String lhs, String rhs) {
+                            return rhs.compareTo(lhs);
+                        }
+                    });
+                    Collections.sort(imageDataPathList, new Comparator<String>() {
+                        @Override
+                        public int compare(String lhs, String rhs) {
+                            return rhs.compareTo(lhs);
+                        }
+                    });
+                }
+                return null;
             }
-        });
-        if (files.length == 0)
-            Toast.makeText(DrawMainActivity.getContext(), "画廊里暂时还没有作品", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(DrawMainActivity.getContext(), "点击图片可以重新载入编辑", Toast.LENGTH_SHORT).show();
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                if (imagePathList.size() == 0) {
+                    Toast.makeText(GalleryActivity.this, "画廊里暂时还没有作品", Toast.LENGTH_SHORT).show();
+                } else {
+                    adapter.reset(imagePathList);
+                    Toast.makeText(GalleryActivity.this, "点击图片可以重新载入编辑", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    /**
+     * 返回
+     *
+     * @param view
+     */
+    public void onBackBtn(View view) {
+        finish();
     }
 
     /**
@@ -145,7 +194,11 @@ public class GalleryActivity extends AppCompatActivity {
         return re;
     }
 
-    public void onBackBtn(View view) {
-        finish();
+    @Override
+    protected void onDestroy() {
+        if (asyncTask != null) {
+            asyncTask.cancel(true);
+        }
+        super.onDestroy();
     }
 }
