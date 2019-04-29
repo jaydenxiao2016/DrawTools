@@ -32,4 +32,9 @@ public class FillPelStep extends Step
 		(curPel.paint).set(oldPaint);
 		canvasVi.updateSavedBitmap();
 	}
+
+	@Override
+	public void setToUndoPel(Pel pel) {
+
+	}
 }

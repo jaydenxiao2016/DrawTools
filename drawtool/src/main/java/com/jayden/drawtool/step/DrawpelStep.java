@@ -38,4 +38,9 @@ public class DrawPelStep extends Step
 		pelList.remove(location); //删除链表对应索引位置图元
 		canvasVi.updateSavedBitmap();
 	}
+
+	@Override
+	public void setToUndoPel(Pel pel) {
+
+	}
 }

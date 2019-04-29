@@ -29,21 +29,16 @@ public abstract class Step {
     /**
      * 进undo栈时对List中图元的更新（子类覆写）
      */
-    public void toUndoUpdate()
-    {
-    }
+    public abstract void toUndoUpdate();
 
     /**
      * 进redo栈时对List中图元的反悔（子类覆写）
      */
-    public void toRedoUpdate()
-    {
-    }
+    public abstract void toRedoUpdate();
 
     /**
      * 进undo栈时对List中图元的更新（子类覆写）
      * @param pel
      */
-    public void setToUndoPel(Pel pel) {
-    }
+    public abstract void setToUndoPel(Pel pel);
 }
