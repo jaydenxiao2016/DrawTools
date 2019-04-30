@@ -1,8 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.jayden.drawtool">
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application>
+        <!--绘制主界面-->
+        <activity android:name=".ui.activity.DrawMainActivity"/>
+        <!--画廊界面-->
+        <activity android:name=".ui.activity.GalleryActivity"/>
+    </application>
 </manifest>

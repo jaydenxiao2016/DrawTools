@@ -40,6 +40,7 @@ public class TextDialog extends Dialog {
         setCancelable(true);
         initView();
     }
+
     /**
      * 初始化
      */
@@ -61,7 +62,8 @@ public class TextDialog extends Dialog {
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(editText.getText().toString())) {
                     if (onClickTextListener != null) {
-                        onClickTextListener.conClickContent(editText.getText().toString(),radioGroup.getCheckedRadioButtonId() == R.id.rb_v);
+                        onClickTextListener.conClickContent(editText.getText().toString(), radioGroup.getCheckedRadioButtonId() == R.id.rb_v);
+                        editText.setText("");
                     }
                     dismiss();
                 } else {
@@ -76,7 +78,7 @@ public class TextDialog extends Dialog {
     }
 
     public interface OnClickTextListener {
-        void conClickContent(String content,boolean isVertical);
+        void conClickContent(String content, boolean isVertical);
     }
 }
 

@@ -62,8 +62,8 @@ public class TransformTouch extends Touch {
         Pel minPel = null;
         //未选中
         if (selectedPel == null) {
-            for (int i = pelList.size() - 1; i >= 0; i--) {
-                Pel pel = pelList.get(i);
+            for (int i = CanvasView.getPelList().size() - 1; i >= 0; i--) {
+                Pel pel = CanvasView.getPelList().get(i);
                 Rect bounds = (pel.region).getBounds();
                 //开始位置
                 RectF oldRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
@@ -180,7 +180,7 @@ public class TransformTouch extends Touch {
                 oriDx = selectedPel.transDx;
                 oriDy = selectedPel.transDy;
                 step.setToUndoPel(selectedPel);//设置进行该次步骤后的变换因子
-                undoStack.push(step);//将该“步”压入undo栈
+                CanvasView.getUndoStack().push(step);//将该“步”压入undo栈
                 // 敲定此次操作的最终区域
                 if (selectedPel != null)
                     (savedPel.path).set(selectedPel.path); //初始位置也同步更新

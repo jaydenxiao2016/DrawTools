@@ -11,9 +11,7 @@ import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
-import java.util.List;
 import java.util.ListIterator;
-import java.util.Stack;
 
 /**
  * 类名：Touch.java
@@ -24,21 +22,9 @@ import java.util.Stack;
  */
 public class Touch {
     /**
-     * 获取undo
-     */
-    protected static Stack<Step> undoStack = CanvasView.getUndoStack();
-    /**
-     * 获取redo
-     */
-    protected static Stack<Step> redoStack = CanvasView.getRedoStack();
-    /**
      * 画布裁剪区域
      */
     protected static Region clipRegion = CanvasView.getClipRegion();
-    /**
-     * 图元链表// 屏幕宽高
-     */
-    protected static List<Pel> pelList = CanvasView.getPelList();
     /**
      * 当前选中图元
      */
@@ -129,7 +115,7 @@ public class Touch {
     }
 
     public void drawPels() {
-        ListIterator<Pel> pelIterator = pelList.listIterator();// 获取pelList对应的迭代器头结点
+        ListIterator<Pel> pelIterator = CanvasView.getPelList().listIterator();// 获取pelList对应的迭代器头结点
         while (pelIterator.hasNext()) {
             Pel pel = pelIterator.next();
             if (!pel.equals(selectedPel)) {

@@ -78,10 +78,10 @@ public class DrawTouch extends Touch {
              */
 
             //1.将新画好的图元存入图元链表中
-            pelList.add(pel);
+            CanvasView.getPelList().add(pel);
 
             //2.包装好当前步骤 内的操作
-            undoStack.push(new DrawPelStep(pel));//将该“步”压入undo栈
+            CanvasView.getUndoStack().push(new DrawPelStep(pel));//将该“步”压入undo栈
 
             //3.更新重绘位图
             CanvasView.setSelectedPel(selectedPel = null);//刚才画的图元失去焦点
