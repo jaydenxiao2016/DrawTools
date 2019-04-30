@@ -278,7 +278,13 @@ public class DrawMainActivity extends AppCompatActivity {
         //更新touch
         updatePelTouch();
     }
-
+    public static void openOrCloseTools() {
+        if(downToolbarSclVi.getVisibility()==View.GONE){
+            openTools();
+        }else{
+            closeTools();
+        }
+    }
     //打开工具箱
     public static void openTools() {
         if (transBarLinearLayout.getVisibility() == View.VISIBLE) //如果变换箱为打开状态

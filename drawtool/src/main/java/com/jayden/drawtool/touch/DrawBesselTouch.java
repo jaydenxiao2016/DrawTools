@@ -3,7 +3,6 @@ package com.jayden.drawtool.touch;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.DataInputStream;
@@ -56,7 +55,11 @@ public class DrawBesselTouch extends DrawTouch {
 
     @Override
     public void up() {
-        ifNeedToOpenTools();
+        if (dis < 10f) {
+            super.up();
+            control=false;
+            return;
+        }
         PointF upPoint = new PointF();
         upPoint.set(curPoint);
 
@@ -67,33 +70,26 @@ public class DrawBesselTouch extends DrawTouch {
         } else {
             newPel.closure = true;
             //路径组成的点
-            newPel.pathPointFList.add(new PointF(beginPoint.x,beginPoint.y));
-            newPel.pathPointFList.add(new PointF(movePoint.x,movePoint.y));
-            newPel.pathPointFList.add(new PointF(endPoint.x,endPoint.y));
+            newPel.pathPointFList.add(new PointF(beginPoint.x, beginPoint.y));
+            newPel.pathPointFList.add(new PointF(movePoint.x, movePoint.y));
+            newPel.pathPointFList.add(new PointF(endPoint.x, endPoint.y));
             super.up(); //最终敲定
             control = false;
         }
         movePoint.set(beginPoint);
     }
 
-    public void ifNeedToOpenTools() {
-        if (dis < 10f) {
-            dis = 0;
-            DrawMainActivity.openTools();
-            control = true;
-            return;
-        }
-    }
 
     /**
      * 构造贝塞尔曲线pel
+     *
      * @param in
      * @return
      */
-    public static Pel loadPel(DataInputStream in) throws Exception{
+    public static Pel loadPel(DataInputStream in) throws Exception {
         //点总数
         int pointSize = in.readInt();
-        List<PointF> pathPointFList=new ArrayList<>();
+        List<PointF> pathPointFList = new ArrayList<>();
         //点坐标
         for (int i = 0; i < pointSize; i++) {
             Float x = in.readFloat();

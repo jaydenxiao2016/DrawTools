@@ -13,8 +13,6 @@ import com.jayden.drawtool.step.Step;
 import com.jayden.drawtool.step.TransformPelStep;
 import com.jayden.drawtool.ui.view.CanvasView;
 
-import java.util.ListIterator;
-
 
 /**
  * 类名：TransformTouch.java
@@ -60,47 +58,33 @@ public class TransformTouch extends Touch {
         // 获取down事件的发生位置
         downPoint.set(curPoint);
 
-        // 判断是否相交
-        Pel minDisPel = null;
-        float minHorizontalDis = Float.MAX_VALUE;
-        float minVerticalDis = Float.MAX_VALUE;
+        //选中最近的图元
+        Pel minPel = null;
         //未选中
         if (selectedPel == null) {
-            ListIterator<Pel> pelIterator = pelList.listIterator(); // 获取pelList对应的迭代器头结点
-            while (pelIterator.hasNext()) {
-                Pel pel = pelIterator.next();
+            for (int i = pelList.size() - 1; i >= 0; i--) {
+                Pel pel = pelList.get(i);
                 Rect bounds = (pel.region).getBounds();
                 //开始位置
                 RectF oldRect = new RectF(bounds.left, bounds.top, bounds.right, bounds.bottom);
                 //变换后新位置
                 RectF rect = new RectF();
                 Matrix cachedMatrix = new Matrix();
+                PointF centerPoint = calPelCenterPoint(pel);
                 cachedMatrix.setTranslate(pel.transDx, pel.transDy);
-                cachedMatrix.postScale(pel.scale, pel.scale, pel.centerPoint.x, pel.centerPoint.y);
-                cachedMatrix.postRotate(pel.degree, pel.centerPoint.x, pel.centerPoint.y);
+                cachedMatrix.postScale(pel.scale, pel.scale, centerPoint.x, centerPoint.y);
+                cachedMatrix.postRotate(pel.degree, centerPoint.x, centerPoint.y);
                 reSetDstRect(cachedMatrix, rect, oldRect);
-                float leftDis = Math.abs(rect.left - downPoint.x);
-                float rightDis = Math.abs(rect.right - downPoint.x);
-                float horizontalDis = leftDis + rightDis;
-
-                float topDis = Math.abs(rect.top - downPoint.y);
-                float bottomDis = Math.abs(rect.bottom - downPoint.y);
-                float verticalDis = topDis + bottomDis;
-
-                if (horizontalDis < minHorizontalDis || verticalDis < minVerticalDis) {
-                    if (leftDis + rightDis < rect.width() + 5) {
-                        if (topDis + bottomDis < rect.height() + 5) {
-                            minDisPel = pel;
-                            minHorizontalDis = leftDis + rightDis;
-                            minVerticalDis = topDis + bottomDis;
-                        }
-                    }
+                //是否在范围里面
+                if (isInsideRF(downPoint.x, downPoint.y, rect)) {
+                    minPel = pel;
+                    break;
                 }
             }
             // 圆域扩展到最大是否有选中任何图元
-            if (minDisPel != null) {
+            if (minPel != null) {
                 // 敲定该图元
-                CanvasView.setSelectedPel(selectedPel = minDisPel);
+                CanvasView.setSelectedPel(selectedPel = minPel);
                 (savedPel.path).set(selectedPel.path); // 原始选中图元所在位置记忆到零时图元中去
                 //初始化选中
                 initSelect();
@@ -133,6 +117,7 @@ public class TransformTouch extends Touch {
                 updateSavedBitmap();
             }
         }
+
     }
 
     // 第二只手指按下

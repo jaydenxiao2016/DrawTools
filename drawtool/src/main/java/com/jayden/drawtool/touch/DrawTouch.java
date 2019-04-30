@@ -92,9 +92,8 @@ public class DrawTouch extends Touch {
     public boolean isNeedToOpenTools() {
         if (dis < 10f) {
             dis = 0;
-            DrawMainActivity.openTools();
+            DrawMainActivity.openOrCloseTools();
             control = true;
-
             return true;
         } else {
             dis = 0;

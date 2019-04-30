@@ -225,11 +225,6 @@ public class CanvasView extends View {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:// 第一只手指按下
             {
-                if (DrawMainActivity.topToolbarSclVi.getVisibility() == View.VISIBLE) {
-                    DrawMainActivity.closeTools();
-                    touch.dis = Float.MAX_VALUE;
-                }
-
                 touch.down1();
             }
             break;
@@ -237,6 +232,9 @@ public class CanvasView extends View {
                 touch.down2();
                 break;
             case MotionEvent.ACTION_MOVE:
+                if (DrawMainActivity.topToolbarSclVi.getVisibility() == View.VISIBLE) {
+                    DrawMainActivity.closeTools();
+                }
                 touch.move();
                 break;
             case MotionEvent.ACTION_UP:// 第一只手指抬起
@@ -585,7 +583,7 @@ public class CanvasView extends View {
                         break;
                     //文本
                     case 20:
-                        Text text = new Text(in.readUTF(),in.readBoolean());
+                        Text text = new Text(in.readUTF(), in.readBoolean());
                         pel = new Pel();
                         pel.type = 20;
                         pel.text = text;
@@ -616,11 +614,11 @@ public class CanvasView extends View {
                     //画笔颜色
                     int color = in.readInt();
                     pel.paint.setColor(color);
-                    pel.paintColor=color;
+                    pel.paintColor = color;
                     ///画笔宽度
                     float width = in.readFloat();
                     pel.paint.setStrokeWidth(width);
-                    pel.paintStrokeWidth=width;
+                    pel.paintStrokeWidth = width;
                 }
                 CanvasView.pelList.add(pel);
             }

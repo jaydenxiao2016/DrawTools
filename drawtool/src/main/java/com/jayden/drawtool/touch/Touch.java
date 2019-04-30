@@ -81,11 +81,13 @@ public class Touch {
 
     // 第一只手指按下
     public void down1() {
+        dis = 0;
         frontPoint1.set(curPoint);
     }
 
     // 第二只手指按下
     public void down2() {
+        dis = 0;
         frontPoint2.set(secPoint);
     }
 
@@ -107,7 +109,7 @@ public class Touch {
     public void up() {
         if (dis < 10f) {
             dis = 0;
-            DrawMainActivity.openTools();
+            DrawMainActivity.openOrCloseTools();
             return;
         }
         dis = 0;

@@ -95,8 +95,8 @@ public class Pel extends BasePel {
         pel.type = type;
         pel.pathPointFList = pathPointFList;
         pel.bottomRightPointF = bottomRightPointF;
-        pel.centerPoint = centerPoint;
-        pel.beginPoint = beginPoint;
+        pel.centerPoint = new PointF(centerPoint.x,centerPoint.y);
+        pel.beginPoint = new PointF(beginPoint.x,beginPoint.y);
         pel.transDx = transDx;
         pel.transDy = transDy;
         pel.scale = scale;

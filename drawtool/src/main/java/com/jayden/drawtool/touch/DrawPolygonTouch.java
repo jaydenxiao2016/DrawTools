@@ -4,7 +4,6 @@ import android.graphics.Path;
 import android.graphics.PointF;
 
 import com.jayden.drawtool.bean.Pel;
-import com.jayden.drawtool.ui.activity.DrawMainActivity;
 import com.jayden.drawtool.ui.view.CanvasView;
 
 import java.io.DataInputStream;
@@ -87,8 +86,6 @@ public class DrawPolygonTouch extends DrawTouch {
     public boolean isNeedToOpenTools() {
         if (dis < 10f) {
             dis = 0;
-            DrawMainActivity.openTools();
-
             return true;
         } else {
             return false;
