@@ -17,30 +17,32 @@ public class DrawLineTouch extends DrawTouch {
     public DrawLineTouch() {
         super();
     }
+
     @Override
-    public void down1()
-    {
+    public void down1() {
         super.down1();
-        newPel=null;
+        newPel = null;
     }
+
     @Override
     public void move() {
         super.move();
-
-        newPel = new Pel();
-        newPel.type = 14;
         movePoint.set(curPoint);
+        if (dis > 10) {
+            newPel = new Pel();
+            newPel.type = 14;
 
-        (newPel.path).moveTo(downPoint.x, downPoint.y);
-        (newPel.path).lineTo(movePoint.x, movePoint.y);
-        (newPel.path).lineTo(movePoint.x, movePoint.y + 1);
+            (newPel.path).moveTo(downPoint.x, downPoint.y);
+            (newPel.path).lineTo(movePoint.x, movePoint.y);
+            (newPel.path).lineTo(movePoint.x, movePoint.y + 1);
 
-        CanvasView.setSelectedPel(selectedPel = newPel);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override
     public void up() {
-        if(newPel!=null) {
+        if (newPel != null) {
             newPel.closure = false;
             //路径组成的点
             newPel.pathPointFList.add(new PointF(downPoint.x, downPoint.y));
@@ -52,13 +54,14 @@ public class DrawLineTouch extends DrawTouch {
 
     /**
      * 构造直线pel
+     *
      * @param in
      * @return
      */
-    public static Pel loadPel(DataInputStream in) throws Exception{
+    public static Pel loadPel(DataInputStream in) throws Exception {
         //点总数
         int pointSize = in.readInt();
-        List<PointF>pathPointFList=new ArrayList<>();
+        List<PointF> pathPointFList = new ArrayList<>();
         //点坐标
         for (int i = 0; i < pointSize; i++) {
             Float x = in.readFloat();

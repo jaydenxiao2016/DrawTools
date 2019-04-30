@@ -286,6 +286,41 @@ public class CanvasView extends View {
         invalidate();
     }
 
+    /**
+     * 放大画布
+     */
+    private float scale=1f;
+    public void zoomUp()
+    {
+        //创建缓冲位图
+        ensureBitmapRecycled(savedBitmap);
+        savedBitmap = backgroundBitmap.copy(Bitmap.Config.ARGB_8888, true);//由画布背景创建缓冲位图
+        savedCanvas.setBitmap(savedBitmap);
+        //画除selectedPel外的所有图元
+        drawPels();
+        if (scale < 2) {
+            scale += 0.2f;
+        }
+        invalidate();
+    }
+
+    /**
+     * 缩小
+     */
+    public void zoomDown()
+    {
+        //创建缓冲位图
+        ensureBitmapRecycled(savedBitmap);
+        savedBitmap = backgroundBitmap.copy(Bitmap.Config.ARGB_8888, true);//由画布背景创建缓冲位图
+        savedCanvas.setBitmap(savedBitmap);
+        //画除selectedPel外的所有图元
+        drawPels();
+        if (scale > 1) {
+            scale -= 0.2f;
+        }
+        invalidate();
+    }
+
     public void drawPels() {
         ListIterator<Pel> pelIterator = pelList.listIterator();// 获取pelList对应的迭代器头结点
         while (pelIterator.hasNext()) {

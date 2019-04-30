@@ -23,14 +23,15 @@ public class DrawOvalTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
-        newPel = new Pel();
-        newPel.type = 13;
         movePoint.set(curPoint);
+        if (dis > 10) {
+            newPel = new Pel();
+            newPel.type = 13;
 
-        (newPel.path).addOval(new RectF(downPoint.x, downPoint.y, movePoint.x, movePoint.y), Path.Direction.CCW);
+            (newPel.path).addOval(new RectF(downPoint.x, downPoint.y, movePoint.x, movePoint.y), Path.Direction.CCW);
 
-        CanvasView.setSelectedPel(selectedPel = newPel);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override

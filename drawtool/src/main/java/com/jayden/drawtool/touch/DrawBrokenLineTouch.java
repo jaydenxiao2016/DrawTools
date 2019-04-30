@@ -43,12 +43,12 @@ public class DrawBrokenLineTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
         movePoint.set(curPoint);
-
-        (newPel.path).set(lastPath);
-        (newPel.path).lineTo(movePoint.x, movePoint.y);
-        CanvasView.setSelectedPel(selectedPel = newPel);
+        if (dis > 10) {
+            (newPel.path).set(lastPath);
+            (newPel.path).lineTo(movePoint.x, movePoint.y);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override

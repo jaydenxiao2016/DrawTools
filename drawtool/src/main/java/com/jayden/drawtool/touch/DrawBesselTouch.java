@@ -37,27 +37,27 @@ public class DrawBesselTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
         movePoint.set(curPoint);
+        if (dis > 10) {
+            (newPel.path).reset();
+            if (control == false) //非拉伸贝塞尔曲线操作
+            {
+                (newPel.path).moveTo(beginPoint.x, beginPoint.y);
+                (newPel.path).cubicTo(beginPoint.x, beginPoint.y, beginPoint.x, beginPoint.y, movePoint.x, movePoint.y);
+            } else {
+                (newPel.path).moveTo(beginPoint.x, beginPoint.y);
+                (newPel.path).cubicTo(beginPoint.x, beginPoint.y, movePoint.x, movePoint.y, endPoint.x, endPoint.y);
+            }
 
-        (newPel.path).reset();
-        if (control == false) //非拉伸贝塞尔曲线操作
-        {
-            (newPel.path).moveTo(beginPoint.x, beginPoint.y);
-            (newPel.path).cubicTo(beginPoint.x, beginPoint.y, beginPoint.x, beginPoint.y, movePoint.x, movePoint.y);
-        } else {
-            (newPel.path).moveTo(beginPoint.x, beginPoint.y);
-            (newPel.path).cubicTo(beginPoint.x, beginPoint.y, movePoint.x, movePoint.y, endPoint.x, endPoint.y);
+            CanvasView.setSelectedPel(selectedPel = newPel);
         }
-
-        CanvasView.setSelectedPel(selectedPel = newPel);
     }
 
     @Override
     public void up() {
         if (dis < 10f) {
             super.up();
-            control=false;
+            control = false;
             return;
         }
         PointF upPoint = new PointF();

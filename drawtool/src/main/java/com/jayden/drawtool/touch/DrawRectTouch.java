@@ -23,20 +23,21 @@ public class DrawRectTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
-        newPel = new Pel();
-        newPel.type = 11;
         movePoint.set(curPoint);
+        if (dis > 10) {
+            newPel = new Pel();
+            newPel.type = 11;
 
-        (newPel.path).addRect(new RectF(downPoint.x, downPoint.y, movePoint.x, movePoint.y), Path.Direction.CCW);
+            (newPel.path).addRect(new RectF(downPoint.x, downPoint.y, movePoint.x, movePoint.y), Path.Direction.CCW);
 
-        CanvasView.setSelectedPel(selectedPel = newPel);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override
     public void up() {
         //路径组成的点
-        if((downPoint.x!=curPoint.x||downPoint.y!=curPoint.y)&& newPel != null) {
+        if ((downPoint.x != curPoint.x || downPoint.y != curPoint.y) && newPel != null) {
             newPel.pathPointFList.add(new PointF(downPoint.x, downPoint.y));
             newPel.pathPointFList.add(new PointF(movePoint.x, movePoint.y));
             newPel.closure = true;

@@ -45,13 +45,13 @@ public class DrawPolygonTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
         movePoint.set(curPoint);
+        if (dis > 10) {
+            (newPel.path).set(lastPath);
+            (newPel.path).lineTo(movePoint.x, movePoint.y);
 
-        (newPel.path).set(lastPath);
-        (newPel.path).lineTo(movePoint.x, movePoint.y);
-
-        CanvasView.setSelectedPel(selectedPel = newPel);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override

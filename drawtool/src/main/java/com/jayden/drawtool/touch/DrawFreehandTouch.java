@@ -36,16 +36,17 @@ public class DrawFreehandTouch extends DrawTouch {
     @Override
     public void move() {
         super.move();
-
         movePoint.set(curPoint);
-        //贝塞尔曲线
-        (newPel.path).quadTo(lastPoint.x, lastPoint.y, (lastPoint.x + movePoint.x) / 2, (lastPoint.y + movePoint.y) / 2);
-        //路径组成的点
-        newPel.pathPointFList.add(new PointF(lastPoint.x, lastPoint.y));
-        newPel.pathPointFList.add(new PointF((lastPoint.x + movePoint.x) / 2, (lastPoint.y + movePoint.y) / 2));
+        if (dis > 10) {
+            //贝塞尔曲线
+            (newPel.path).quadTo(lastPoint.x, lastPoint.y, (lastPoint.x + movePoint.x) / 2, (lastPoint.y + movePoint.y) / 2);
+            //路径组成的点
+            newPel.pathPointFList.add(new PointF(lastPoint.x, lastPoint.y));
+            newPel.pathPointFList.add(new PointF((lastPoint.x + movePoint.x) / 2, (lastPoint.y + movePoint.y) / 2));
 
-        lastPoint.set(movePoint);
-        CanvasView.setSelectedPel(selectedPel = newPel);
+            lastPoint.set(movePoint);
+            CanvasView.setSelectedPel(selectedPel = newPel);
+        }
     }
 
     @Override
